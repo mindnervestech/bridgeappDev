@@ -39,7 +39,22 @@ public class ReportVM {
 	public String firstServiceDate;
 	public String paidAmount;
 	public String claimTypeValue;
+	public String PcpLocation;
+	public String clinicName;
 	
+	
+	public String getClinicName() {
+		return clinicName;
+	}
+	public void setClinicName(String clinicName) {
+		this.clinicName = clinicName;
+	}
+	public String getPcpLocation() {
+		return PcpLocation;
+	}
+	public void setPcpLocation(String pcpLocation) {
+		PcpLocation = pcpLocation;
+	}
 	public String getFromDate() {
 		return fromDate;
 	}

@@ -53,11 +53,13 @@ import com.mnt.vm.SpecialistComparisonPrintDataVM;
 import com.mnt.vm.SpecialistComparisonReportFileVM;
 import com.mnt.vm.SummaryReportFileVM;
 import com.mnt.vm.SummaryReportPrintDataVM;
+import com.mnt.vm.reports.BeneficiariesManagementByClinicReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorReportExpandFileVM;
+import com.mnt.vm.reports.BeneficiariesManagementByLocationReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementExpandReportPrintDataVM;
@@ -249,6 +251,18 @@ public class DashboardController {
     public DashboardReportsVM getBeneficiariesManagementByDoctorExpandData(ReportVM vm) {
 		return dashboardService.getBeneficiariesManagementByDoctorExpandReportData(vm);
     }
+	@RequestMapping(value="/getBeneficiariesManagementByLocationExpandData",method = RequestMethod.POST)
+	@ResponseBody
+    public DashboardReportsVM getBeneficiariesManagementByLocationExpandData(ReportVM vm) {
+		return dashboardService.getBeneficiariesManagementByLocationExpandReportData(vm);
+    }
+	
+	@RequestMapping(value="/getBeneficiariesManagementByClinicExpandData",method = RequestMethod.POST)
+	@ResponseBody
+    public DashboardReportsVM getBeneficiariesManagementByClinicExpandData(ReportVM vm) {
+		return dashboardService.getBeneficiariesManagementByClinicExpandReportData(vm);
+    }
+	
 	
 	@RequestMapping(value="/getPmpmByPracticeExpandData",method = RequestMethod.POST)
 	@ResponseBody
@@ -351,17 +365,26 @@ public class DashboardController {
     public List<BeneficiariesManagementExpandReportPrintDataVM> getBeneficiariesManagementByDoctorExpandDataForPrint(BeneficiariesManagementByDoctorReportExpandFileVM vm) {
 		return dashboardService.getDataForBeneficiariesManagementByDoctorExpandReportPrint(vm);
     }
-	
-	@RequestMapping(value="/getBeneficiariesManagementByLocationDataForPrint",method = RequestMethod.POST)
+	@RequestMapping(value="/getBeneficiariesManagementByLocationExpandDataForPrint",method = RequestMethod.POST)
 	@ResponseBody
-    public List<BeneficiariesManagementByLocationReportPrintDataVM> getBeneficiariesManagementByLocationDataForPrint(BeneficiariesManagementByLocationReportFileVM vm) {
-		return dashboardService.getDataForBeneficiariesManagementByLocationReportPrint(vm);
+    public List<BeneficiariesManagementExpandReportPrintDataVM> getBeneficiariesManagementByLocationExpandDataForPrint(BeneficiariesManagementByLocationReportExpandFileVM vm) {
+		return dashboardService.getDataForBeneficiariesManagementByLocationExpandReportPrint(vm);
+    }
+	@RequestMapping(value="/getBeneficiariesManagementByClinicExpandDataForPrint",method = RequestMethod.POST)
+	@ResponseBody
+    public List<BeneficiariesManagementExpandReportPrintDataVM> getBeneficiariesManagementByClinicExpandDataForPrint(BeneficiariesManagementByClinicReportExpandFileVM vm) {
+		return dashboardService.getDataForBeneficiariesManagementByClinicExpandReportPrint(vm);
     }
 	
 	@RequestMapping(value="/getBeneficiariesManagementByClinicDataForPrint",method = RequestMethod.POST)
 	@ResponseBody
     public List<BeneficiariesManagementByClinicReportPrintDataVM> getBeneficiariesManagementByClinicDataForPrint(BeneficiariesManagementByClinicReportFileVM vm) {
 		return dashboardService.getDataForBeneficiariesManagementByClinicReportPrint(vm);
+    }
+	@RequestMapping(value="/getBeneficiariesManagementByLocationDataForPrint",method = RequestMethod.POST)
+	@ResponseBody
+    public List<BeneficiariesManagementByLocationReportPrintDataVM> getBeneficiariesManagementByLocationDataForPrint(BeneficiariesManagementByLocationReportFileVM vm) {
+		return dashboardService.getDataForBeneficiariesManagementByLocationReportPrint(vm);
     }
 	
 	@RequestMapping(value="/getBeneficiariesManagementByDoctorDataForPrint",method = RequestMethod.POST)
@@ -1358,64 +1381,6 @@ public class DashboardController {
 		return csv;
 	}
 	
-	@RequestMapping(value="/renderBeneficiariesManagementByClinicXLSX/{json}",method = RequestMethod.GET)
-	@ResponseBody
-	public String renderBeneficiariesManagementByClinicXLSX(@PathVariable String json, HttpServletResponse response) {
-		String csv = "";
-		byte[] decodedBytes = Base64.getDecoder().decode(json);
-		ObjectMapper mapper = new ObjectMapper();
-		BeneficiariesManagementByClinicReportFileVM fileVM = null;
-		try {
-			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportFileVM.class);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Beneficiaries Management Report By Clinic " + ".xlsx\"");
-		try {
-			OutputStream outputStream = response.getOutputStream();
-			dashboardService.generateBeneficiariesManagementByClinicReportXLSX(fileVM,outputStream);
-			outputStream.close();
-			response.flushBuffer();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return csv;
-	}
-	
-	@RequestMapping(value="/renderBeneficiariesManagementByClinicPDF/{json}",method = RequestMethod.GET)
-	@ResponseBody
-	public String renderBeneficiariesManagementByClinicPDF(@PathVariable String json, HttpServletResponse response) {
-		String csv = "";
-		ObjectMapper mapper = new ObjectMapper();
-		byte[] decodedBytes = Base64.getDecoder().decode(json);
-		BeneficiariesManagementByClinicReportFileVM fileVM = null;
-		
-		try {
-			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportFileVM.class);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Beneficiaries Management Report By Clinic" + ".pdf\"");
-		try {
-			OutputStream outputStream = response.getOutputStream();
-			dashboardService.generateBeneficiariesManagementByClinicReportPDF(fileVM,outputStream);
-			outputStream.close();
-			response.flushBuffer();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}
-		return csv;
-	}
-	
 	@RequestMapping(value="/renderBeneficiariesManagementExpandXLSX/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderBeneficiariesManagementExpandXLSX(@PathVariable String json, HttpServletResponse response) {
@@ -1532,6 +1497,117 @@ public class DashboardController {
 		return csv;
 	}
 	
+	@RequestMapping(value="/renderBeneficiariesManagementByClinicXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByClinicXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		BeneficiariesManagementByClinicReportFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Beneficiaries Management Report By Clinic " + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByClinicReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderBeneficiariesManagementByClinicPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByClinicPDF(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		BeneficiariesManagementByClinicReportFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Beneficiaries Management Report By Clinic" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByClinicReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderBeneficiariesManagementByClinicExpandXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByClinicExpandXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		BeneficiariesManagementByClinicReportExpandFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportExpandFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Beneficiaries Management By Clinic Details " + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByClinicExpandReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderBeneficiariesManagementByLocationExpandXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByLocationExpandXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		BeneficiariesManagementByLocationReportExpandFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByLocationReportExpandFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Beneficiaries Management By Location Details " + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByLocationExpandReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	
 	@RequestMapping(value="/renderBeneficiariesManagementByDoctorExpandXLSX/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderBeneficiariesManagementByDoctorExpandXLSX(@PathVariable String json, HttpServletResponse response) {
@@ -1578,6 +1654,70 @@ public class DashboardController {
 		try {
 			OutputStream outputStream = response.getOutputStream();
 			dashboardService.generateBeneficiariesManagementByDoctorExpandReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderBeneficiariesManagementByClinicExpandPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByClinicExpandPDF(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		BeneficiariesManagementByClinicReportExpandFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByClinicReportExpandFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Beneficiaries Management By Clinic Details" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByClinicExpandReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderBeneficiariesManagementByLocationExpandPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderBeneficiariesManagementByLocationExpandPDF(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		BeneficiariesManagementByLocationReportExpandFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), BeneficiariesManagementByLocationReportExpandFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Beneficiaries Management By Location Details" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateBeneficiariesManagementByLocationExpandReportPDF(fileVM,outputStream);
 			outputStream.close();
 			response.flushBuffer();
 		} catch (SQLException e) {

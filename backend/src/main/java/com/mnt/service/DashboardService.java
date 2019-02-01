@@ -29,11 +29,13 @@ import com.mnt.vm.SpecialistComparisonPrintDataVM;
 import com.mnt.vm.SpecialistComparisonReportFileVM;
 import com.mnt.vm.SummaryReportFileVM;
 import com.mnt.vm.SummaryReportPrintDataVM;
+import com.mnt.vm.reports.BeneficiariesManagementByClinicReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorReportExpandFileVM;
+import com.mnt.vm.reports.BeneficiariesManagementByLocationReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementExpandReportPrintDataVM;
@@ -155,6 +157,22 @@ public interface DashboardService {
 			OutputStream outputStream) throws IOException;
 	public void generateBeneficiariesManagementByLocationReportPDF(BeneficiariesManagementByLocationReportFileVM fileVM,
 			OutputStream outputStream) throws SQLException, IOException, DocumentException;
-	public void generateBeneficiariesManagementByClinicReportPDF(BeneficiariesManagementByClinicReportFileVM fileVM,
-			OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public DashboardReportsVM getBeneficiariesManagementByLocationExpandReportData(ReportVM vm);
+	
+	public List<BeneficiariesManagementExpandReportPrintDataVM> getDataForBeneficiariesManagementByLocationExpandReportPrint(
+			BeneficiariesManagementByLocationReportExpandFileVM vm);
+	public void generateBeneficiariesManagementByLocationExpandReportXLSX(
+			BeneficiariesManagementByLocationReportExpandFileVM fileVM, OutputStream outputStream) throws IOException;
+	public void generateBeneficiariesManagementByLocationExpandReportPDF(
+			BeneficiariesManagementByLocationReportExpandFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public void generateBeneficiariesManagementByClinicReportPDF(BeneficiariesManagementByClinicReportFileVM fileVM,	OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public DashboardReportsVM getBeneficiariesManagementByClinicExpandReportData(ReportVM vm);
+	public List<BeneficiariesManagementExpandReportPrintDataVM> getDataForBeneficiariesManagementByClinicExpandReportPrint(
+			BeneficiariesManagementByClinicReportExpandFileVM vm);
+	public void generateBeneficiariesManagementByClinicExpandReportXLSX(
+			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws IOException;
+	public void generateBeneficiariesManagementByClinicExpandReportPDF(
+			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+
+
 }

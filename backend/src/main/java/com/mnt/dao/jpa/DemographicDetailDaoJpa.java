@@ -1303,6 +1303,395 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		return responseVM;
 	}
 	
+	public ReportResponseVM getBeneficiariesManagementByLocationExpandReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "", havingStr = "";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			if(filteredList.get(i).getId().equals("claimId")) {
+				filterColumnName = "claim_id";
+			}
+			if(filteredList.get(i).getId().equals("claimDate")) {
+				filterColumnName = "claim_date";
+			}
+			if(filteredList.get(i).getId().equals("claimType")) {
+				filterColumnName = "claim_type";
+			}
+			if(filteredList.get(i).getId().equals("clinicName")) {
+				filterColumnName = "clinic_facility_name";
+			}
+		
+			if(filteredList.get(i).getId().equals("pcpLocation"))
+			{
+				filterColumnName="pcp_location_code";
+			}
+			if(filteredList.get(i).getId().equals("icdCodes")) {
+				filterColumnName = "principal_diagnosis";
+			}
+			if(filteredList.get(i).getId().equals("hccCodes")) {
+				filterColumnName = "";
+			}
+			if(filteredList.get(i).getId().equals("drgCode")) {
+				filterColumnName = "drg_code";
+			}
+			if(filteredList.get(i).getId().equals("betosCat")) {
+				filterColumnName = "";
+			}
+			if(filteredList.get(i).getId().equals("cost")) {
+				filterColumnName = "cost";
+			}
+			
+			if(!filterColumnName.equals("")) {
+				filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+			
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			if(sortedList.get(0).getId().equals("claimId")) {
+				sortColName = "claim_id";
+			}
+			if(sortedList.get(0).getId().equals("claimDate")) {
+				sortColName = "claim_date";
+			}
+			if(sortedList.get(0).getId().equals("claimType")) {
+				sortColName = "claim_type";
+			}
+			if(sortedList.get(0).getId().equals("clinicName")) {
+				sortColName = "clinic_facility_name";
+			}
+			
+			if(sortedList.get(0).getId().equals("pcpLocation")) {
+				sortColName = "pcp_location_code";
+			}
+			
+			if(sortedList.get(0).getId().equals("icdCodes")) {
+				sortColName = "principal_diagnosis";
+			}
+			if(sortedList.get(0).getId().equals("hccCodes")) {
+				sortColName = "";
+			}
+			if(sortedList.get(0).getId().equals("drgCode")) {
+				sortColName = "drg_code";
+			}
+			if(sortedList.get(0).getId().equals("betosCat")) {
+				sortColName = "	";
+			}
+			if(sortedList.get(0).getId().equals("cost")) {
+				sortColName = "cost";
+			}
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " limit "+start+","+end;
+		String sortCountQryStr = "";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "";
+		
+		if(!filterStr.equals(""))
+			filterStr = " where "+filterStr.substring(4);	
+		
+		if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
+				
+			queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"union\n" + 
+					"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"union\n" + 
+					"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"union\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"union\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"union\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
+					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
+					"+dermatology as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+") A "+filterStr;
+			
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + 
+					queryStr;
+		} else {
+			if(vm.getProvider().equals("all")) {
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where date_filled like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
+						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
+						"+dermatology as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+") A "+filterStr;
+			}
+			if(vm.getYear().equals("all")) {
+				
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
+						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
+						"+dermatology as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+") A "+filterStr;
+			}
+			if(!vm.getProvider().equals("all") && !vm.getYear().equals("all")) {
+				
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where provider="+'\''+vm.getProvider()+'\''+" and date_filled like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"union\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
+						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
+						"+dermatology as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+") A "+filterStr;
+				
+			}
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + 
+					queryStr;
+		}
+		
+		System.out.println(queryStr+sortQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		System.out.println(queryStr+sortQryStr);
+		System.out.println(countQueryStr+sortCountQryStr);
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		System.out.println(noOfPages);
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		
+		String fileQuery = queryStr+sortCountQryStr;
+		
+
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
+	
+	public ReportResponseVM getBeneficiariesManagementByClinicExpandReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "", havingStr = "";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			if(filteredList.get(i).getId().equals("claimId")) {
+				filterColumnName = "claim_id";
+			}
+			if(filteredList.get(i).getId().equals("claimDate")) {
+				filterColumnName = "claim_date";
+			}
+			if(filteredList.get(i).getId().equals("claimType")) {
+				filterColumnName = "claim_type";
+			}
+			if(filteredList.get(i).getId().equals("clinicName")) {
+				filterColumnName = "clinic_facility_name";
+			}
+		
+			if(filteredList.get(i).getId().equals("pcpName"))
+			{
+				filterColumnName="pcp_name";
+			}
+			if(filteredList.get(i).getId().equals("icdCodes")) {
+				filterColumnName = "principal_diagnosis";
+			}
+			if(filteredList.get(i).getId().equals("hccCodes")) {
+				filterColumnName = "";
+			}
+			if(filteredList.get(i).getId().equals("drgCode")) {
+				filterColumnName = "drg_code";
+			}
+			if(filteredList.get(i).getId().equals("betosCat")) {
+				filterColumnName = "";
+			}
+			if(filteredList.get(i).getId().equals("cost")) {
+				filterColumnName = "cost";
+			}
+			
+			if(!filterColumnName.equals("")) {
+				filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+			
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			if(sortedList.get(0).getId().equals("claimId")) {
+				sortColName = "claim_id";
+			}
+			if(sortedList.get(0).getId().equals("claimDate")) {
+				sortColName = "claim_date";
+			}
+			if(sortedList.get(0).getId().equals("claimType")) {
+				sortColName = "claim_type";
+			}
+			if(sortedList.get(0).getId().equals("clinicName")) {
+				sortColName = "clinic_facility_name";
+			}
+			
+			if(sortedList.get(0).getId().equals("pcpName")) {
+				sortColName = "pcp_name";
+			}
+			
+			if(sortedList.get(0).getId().equals("icdCodes")) {
+				sortColName = "principal_diagnosis";
+			}
+			if(sortedList.get(0).getId().equals("hccCodes")) {
+				sortColName = "";
+			}
+			if(sortedList.get(0).getId().equals("drgCode")) {
+				sortColName = "drg_code";
+			}
+			if(sortedList.get(0).getId().equals("betosCat")) {
+				sortColName = "	";
+			}
+			if(sortedList.get(0).getId().equals("cost")) {
+				sortColName = "cost";
+			}
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " limit "+start+","+end;
+		String sortCountQryStr = "";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "";
+		
+		if(!filterStr.equals(""))
+			filterStr = " where "+filterStr.substring(4);	
+		
+		if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
+				
+			queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where clinic_facility_name="+'\''+vm.getClinicName()+'\''+"\n" + 
+					"union\n" + 
+					"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where clinic_facility_name="+'\''+vm.getClinicName()+'\''+") A "+filterStr;
+			
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + 
+					queryStr;
+		} else {
+			if(vm.getProvider().equals("all")) {
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+") A "+filterStr;
+			}
+			if(vm.getYear().equals("all")) {
+				
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_location_code,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+") A "+filterStr;
+			}
+			if(!vm.getProvider().equals("all") && !vm.getYear().equals("all")) {
+				
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+"\n" + 
+						"union\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where provider="+'\''+vm.getProvider()+'\''+" and first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and clinic_facility_name="+'\''+vm.getClinicName()+'\''+") A "+filterStr;
+				
+			}
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + 
+					queryStr;
+		}
+		
+		System.out.println(queryStr+sortQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		System.out.println(queryStr+sortQryStr);
+		System.out.println(countQueryStr+sortCountQryStr);
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		System.out.println(noOfPages);
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		
+		String fileQuery = queryStr+sortCountQryStr;
+		
+
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
+	
+
 	public ReportResponseVM getBeneficiariesManagementByDoctorExpandReportData(ReportVM vm) {
 		ReportResponseVM responseVM = new ReportResponseVM();
 		

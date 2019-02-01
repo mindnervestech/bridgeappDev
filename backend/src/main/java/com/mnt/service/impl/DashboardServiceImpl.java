@@ -82,6 +82,7 @@ import com.mnt.vm.SpecialistComparisonReportVM;
 import com.mnt.vm.SummaryReportFileVM;
 import com.mnt.vm.SummaryReportPrintDataVM;
 import com.mnt.vm.SummaryReportVM;
+import com.mnt.vm.reports.BeneficiariesManagementByClinicReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByClinicReportVM;
@@ -89,6 +90,7 @@ import com.mnt.vm.reports.BeneficiariesManagementByDoctorFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByDoctorReportVM;
+import com.mnt.vm.reports.BeneficiariesManagementByLocationReportExpandFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportFileVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportPrintDataVM;
 import com.mnt.vm.reports.BeneficiariesManagementByLocationReportVM;
@@ -935,6 +937,98 @@ public class DashboardServiceImpl implements DashboardService {
 			list.add(dataVM);
 		}
 		gridVM.setBeneficiariesManagementByLocationData(list);
+		gridVM.setPages(noOfPages);
+		gridVM.setTotalCount(responseVM.getTotalCount());
+		gridVM.setFileQuery(responseVM.getFileQuery());
+		return gridVM;
+	}
+	
+	public DashboardReportsVM getBeneficiariesManagementByLocationExpandReportData(ReportVM vm) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = null;
+		Integer noOfPages = 0;
+		List<BeneficiariesManagementExpandReportVM> list = new ArrayList<>();
+		DashboardReportsVM gridVM = new DashboardReportsVM();
+		ReportResponseVM responseVM = demographicDetailDao.getBeneficiariesManagementByLocationExpandReportData(vm);
+		resultData = responseVM.getDataList();
+		noOfPages = responseVM.getNoOfPages();
+		
+		for(Object[] obj: resultData) {
+			BeneficiariesManagementExpandReportVM dataVM = new BeneficiariesManagementExpandReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setClaimId(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setClaimDate(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setClaimType(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setClinicName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setPcpLocation(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setDrgCode("");
+			if(obj[6] != null)
+				dataVM.setBetosCat("");
+			if(obj[7] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setIcdCodes(obj[8].toString());
+			dataVM.setHccCodes("");
+			dataVM.setDrgCode("");
+			dataVM.setBetosCat("");
+			
+			list.add(dataVM);
+		}
+		gridVM.setBeneficiariesManagementByLocationExpandData(list);
+		gridVM.setPages(noOfPages);
+		gridVM.setTotalCount(responseVM.getTotalCount());
+		gridVM.setFileQuery(responseVM.getFileQuery());
+		return gridVM;
+	}
+	
+	public DashboardReportsVM getBeneficiariesManagementByClinicExpandReportData(ReportVM vm) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = null;
+		Integer noOfPages = 0;
+		List<BeneficiariesManagementExpandReportVM> list = new ArrayList<>();
+		DashboardReportsVM gridVM = new DashboardReportsVM();
+		ReportResponseVM responseVM = demographicDetailDao.getBeneficiariesManagementByClinicExpandReportData(vm);
+		resultData = responseVM.getDataList();
+		noOfPages = responseVM.getNoOfPages();
+		
+		for(Object[] obj: resultData) {
+			BeneficiariesManagementExpandReportVM dataVM = new BeneficiariesManagementExpandReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setClaimId(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setClaimDate(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setClaimType(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setClinicName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setPcpName(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setDrgCode(obj[5].toString());
+			else
+				dataVM.setDrgCode("");
+			if(obj[6] != null)
+				dataVM.setBetosCat(obj[6].toString());
+			else
+				dataVM.setBetosCat("");
+			if(obj[7] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setIcdCodes(obj[8].toString());
+			dataVM.setHccCodes("");
+		
+			
+			
+			list.add(dataVM);
+		}
+		gridVM.setBeneficiariesManagementByClinicExpandData(list);
 		gridVM.setPages(noOfPages);
 		gridVM.setTotalCount(responseVM.getTotalCount());
 		gridVM.setFileQuery(responseVM.getFileQuery());
@@ -1807,6 +1901,84 @@ public class DashboardServiceImpl implements DashboardService {
 			if(obj[8] != null)
 				dataVM.setIcdCodes(obj[8].toString());
 			dataVM.setHccCodes("");
+			
+			list.add(dataVM);
+		}
+		
+		return list;
+	}
+	
+	public List<BeneficiariesManagementExpandReportPrintDataVM> getDataForBeneficiariesManagementByClinicExpandReportPrint(BeneficiariesManagementByClinicReportExpandFileVM fileVM) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
+		List<BeneficiariesManagementExpandReportPrintDataVM> list = new ArrayList<>();
+		
+		for(Object[] obj: resultData) {
+			BeneficiariesManagementExpandReportPrintDataVM dataVM = new BeneficiariesManagementExpandReportPrintDataVM();
+			
+			if(obj[0] != null)
+				dataVM.setClaimId(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setClaimDate(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setClaimType(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setClinicName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setPcpName(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setDrgCode(obj[5].toString());
+			else
+				dataVM.setDrgCode("");
+			if(obj[6] != null)
+				dataVM.setBetosCat(obj[6].toString());
+			else
+				dataVM.setBetosCat("");
+			if(obj[7] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setIcdCodes(obj[8].toString());
+			dataVM.setHccCodes("");
+			
+			
+			list.add(dataVM);
+		}
+		
+		return list;
+	}
+	
+	public List<BeneficiariesManagementExpandReportPrintDataVM> getDataForBeneficiariesManagementByLocationExpandReportPrint(BeneficiariesManagementByLocationReportExpandFileVM fileVM) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
+		List<BeneficiariesManagementExpandReportPrintDataVM> list = new ArrayList<>();
+		
+		for(Object[] obj: resultData) {
+			BeneficiariesManagementExpandReportPrintDataVM dataVM = new BeneficiariesManagementExpandReportPrintDataVM();
+			
+			if(obj[0] != null)
+				dataVM.setClaimId(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setClaimDate(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setClaimType(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setClinicName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setPcpLocation(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setDrgCode(obj[5].toString());
+			else
+				dataVM.setDrgCode("");
+			if(obj[6] != null)
+				dataVM.setBetosCat(obj[6].toString());
+			else
+				dataVM.setBetosCat("");
+			if(obj[7] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setIcdCodes(obj[8].toString());
+			dataVM.setHccCodes("");
+		
 			
 			list.add(dataVM);
 		}
@@ -4942,6 +5114,507 @@ public class DashboardServiceImpl implements DashboardService {
 	        IOUtils.copy(is, os);
 	}
 	
+public void generateBeneficiariesManagementByLocationExpandReportPDF(BeneficiariesManagementByLocationReportExpandFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+		
+		List<BeneficiariesManagementExpandReportPrintDataVM> list = getDataForBeneficiariesManagementByLocationExpandReportPrint(fileVM);
+		
+		File file = new File("Data export-Beneficiaries Management By Doctor Details.pdf");
+		 Document document = new Document();
+	        PdfWriter.getInstance(document, new FileOutputStream(file));
+	        document.open();
+	        
+	        int tableColumnSize = 0;
+	        if(fileVM.showClaimId_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showClaimDate_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showClaimType_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showClinicName_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showPcpLocation_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showIcdCodes_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showHccCodes_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showDrgCode_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showBetosCat_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showCost_beneficiariesManagementByLocationExpand)
+	        	tableColumnSize++;
+	        
+	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+	        
+	        @SuppressWarnings("deprecation")
+			BaseColor myColor = WebColors.getRGBColor("#2D4154");
+	        
+	        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+	        if(fileVM.showClaimId_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell3 = new PdfPCell(new Paragraph("Claim Id", font));
+	        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell3.setBackgroundColor(myColor);
+		        cell3.setBorderColor(BaseColor.WHITE);
+		        cell3.setBorderWidth(0.1f);
+	        	table.addCell(cell3);
+	        }
+	        if(fileVM.showClaimDate_beneficiariesManagementByLocationExpand) {
+		        PdfPCell cell1 = new PdfPCell(new Paragraph("Claim Date", font));
+		        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell1.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell1.setBackgroundColor(myColor);
+		        cell1.setBorderColor(BaseColor.WHITE);
+		        cell1.setBorderWidth(0.1f);
+		        table.addCell(cell1);
+	        }
+	        if(fileVM.showClaimType_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell4 = new PdfPCell(new Paragraph("Claim Type", font));
+	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell4.setBackgroundColor(myColor);
+		        cell4.setBorderColor(BaseColor.WHITE);
+		        cell4.setBorderWidth(0.1f);
+	        	table.addCell(cell4);
+	        }
+	        if(fileVM.showClinicName_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("Clinic Name", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showPcpLocation_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("PCP Location", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showIcdCodes_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("ICD Codes", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        if(fileVM.showHccCodes_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("HCC Codes", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        if(fileVM.showDrgCode_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("DRG Code", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        if(fileVM.showBetosCat_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Betos Cat", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        if(fileVM.showCost_beneficiariesManagementByLocationExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Cost", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        table.setHeaderRows(1);
+	        
+	        BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+	        
+	        int count = 1; //table rows
+	        for(BeneficiariesManagementExpandReportPrintDataVM vm: list) {
+	        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+	        	if(fileVM.showClaimId_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell3 = new PdfPCell(new Paragraph(vm.getClaimId(), rowFont));
+			        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell3.setBackgroundColor(oddRowColor);
+			        rowCell3.setBorderColor(BaseColor.WHITE);
+			        rowCell3.setBorderWidth(0.1f);
+			        table.addCell(rowCell3);
+		        }
+	        	if(fileVM.showClaimDate_beneficiariesManagementByLocationExpand) {
+			        PdfPCell rowCell1 = new PdfPCell(new Paragraph(vm.getClaimDate(), rowFont));
+			        rowCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell1.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell1.setBackgroundColor(oddRowColor);
+			        rowCell1.setBorderColor(BaseColor.WHITE);
+			        rowCell1.setBorderWidth(0.1f);
+			        table.addCell(rowCell1);
+	        	}
+		        if(fileVM.showClaimType_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getClaimType(), rowFont));
+			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell4.setBackgroundColor(oddRowColor);
+			        rowCell4.setBorderColor(BaseColor.WHITE);
+			        rowCell4.setBorderWidth(0.1f);
+			        table.addCell(rowCell4);
+		        }
+		        if(fileVM.showClinicName_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getClinicName(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showPcpLocation_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getPcpLocation(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showIcdCodes_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getIcdCodes(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showHccCodes_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getHccCodes(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showDrgCode_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getDrgCode(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showBetosCat_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getBetosCat(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showCost_beneficiariesManagementByLocationExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getCost(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        
+		        count++;
+	        }
+	        
+	        table.setWidthPercentage(100);
+	        document.add(table);
+	        document.close();
+	        InputStream is = new FileInputStream(file);
+	        IOUtils.copy(is, os);
+	}
+
+public void generateBeneficiariesManagementByClinicExpandReportPDF(BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+	
+	List<BeneficiariesManagementExpandReportPrintDataVM> list = getDataForBeneficiariesManagementByClinicExpandReportPrint(fileVM);
+	
+	File file = new File("Data export-Beneficiaries Management By Clinic Details.pdf");
+	 Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(file));
+        document.open();
+        
+        int tableColumnSize = 0;
+        if(fileVM.showClaimId_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showClaimDate_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showClaimType_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showClinicName_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showPcpName_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showIcdCodes_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showHccCodes_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showDrgCode_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showBetosCat_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        if(fileVM.showCost_beneficiariesManagementByClinicExpand)
+        	tableColumnSize++;
+        
+        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+        
+        @SuppressWarnings("deprecation")
+		BaseColor myColor = WebColors.getRGBColor("#2D4154");
+        
+        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+        if(fileVM.showClaimId_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell3 = new PdfPCell(new Paragraph("Claim Id", font));
+        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell3.setBackgroundColor(myColor);
+	        cell3.setBorderColor(BaseColor.WHITE);
+	        cell3.setBorderWidth(0.1f);
+        	table.addCell(cell3);
+        }
+        if(fileVM.showClaimDate_beneficiariesManagementByClinicExpand) {
+	        PdfPCell cell1 = new PdfPCell(new Paragraph("Claim Date", font));
+	        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell1.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell1.setBackgroundColor(myColor);
+	        cell1.setBorderColor(BaseColor.WHITE);
+	        cell1.setBorderWidth(0.1f);
+	        table.addCell(cell1);
+        }
+        if(fileVM.showClaimType_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell4 = new PdfPCell(new Paragraph("Claim Type", font));
+        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell4.setBackgroundColor(myColor);
+	        cell4.setBorderColor(BaseColor.WHITE);
+	        cell4.setBorderWidth(0.1f);
+        	table.addCell(cell4);
+        }
+        if(fileVM.showClinicName_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell5 = new PdfPCell(new Paragraph("Clinic Name", font));
+        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell5.setBackgroundColor(myColor);
+	        cell5.setBorderColor(BaseColor.WHITE);
+	        cell5.setBorderWidth(0.1f);
+        	table.addCell(cell5);
+        }
+        if(fileVM.showPcpName_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell5 = new PdfPCell(new Paragraph("PCP Name", font));
+        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell5.setBackgroundColor(myColor);
+	        cell5.setBorderColor(BaseColor.WHITE);
+	        cell5.setBorderWidth(0.1f);
+        	table.addCell(cell5);
+        }
+        if(fileVM.showIcdCodes_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell7 = new PdfPCell(new Paragraph("ICD Codes", font));
+        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell7.setBackgroundColor(myColor);
+	        cell7.setBorderColor(BaseColor.WHITE);
+	        cell7.setBorderWidth(0.1f);
+        	table.addCell(cell7);
+        }
+        
+        if(fileVM.showHccCodes_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell7 = new PdfPCell(new Paragraph("HCC Codes", font));
+        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell7.setBackgroundColor(myColor);
+	        cell7.setBorderColor(BaseColor.WHITE);
+	        cell7.setBorderWidth(0.1f);
+        	table.addCell(cell7);
+        }
+        
+        if(fileVM.showDrgCode_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell7 = new PdfPCell(new Paragraph("DRG Code", font));
+        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell7.setBackgroundColor(myColor);
+	        cell7.setBorderColor(BaseColor.WHITE);
+	        cell7.setBorderWidth(0.1f);
+        	table.addCell(cell7);
+        }
+        
+        if(fileVM.showBetosCat_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell7 = new PdfPCell(new Paragraph("Betos Cat", font));
+        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell7.setBackgroundColor(myColor);
+	        cell7.setBorderColor(BaseColor.WHITE);
+	        cell7.setBorderWidth(0.1f);
+        	table.addCell(cell7);
+        }
+        
+        if(fileVM.showCost_beneficiariesManagementByClinicExpand) {
+        	PdfPCell cell7 = new PdfPCell(new Paragraph("Cost", font));
+        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+	        cell7.setBackgroundColor(myColor);
+	        cell7.setBorderColor(BaseColor.WHITE);
+	        cell7.setBorderWidth(0.1f);
+        	table.addCell(cell7);
+        }
+        
+        table.setHeaderRows(1);
+        
+        BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+        
+        int count = 1; //table rows
+        for(BeneficiariesManagementExpandReportPrintDataVM vm: list) {
+        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+        	if(fileVM.showClaimId_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell3 = new PdfPCell(new Paragraph(vm.getClaimId(), rowFont));
+		        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell3.setBackgroundColor(oddRowColor);
+		        rowCell3.setBorderColor(BaseColor.WHITE);
+		        rowCell3.setBorderWidth(0.1f);
+		        table.addCell(rowCell3);
+	        }
+        	if(fileVM.showClaimDate_beneficiariesManagementByClinicExpand) {
+		        PdfPCell rowCell1 = new PdfPCell(new Paragraph(vm.getClaimDate(), rowFont));
+		        rowCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell1.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell1.setBackgroundColor(oddRowColor);
+		        rowCell1.setBorderColor(BaseColor.WHITE);
+		        rowCell1.setBorderWidth(0.1f);
+		        table.addCell(rowCell1);
+        	}
+	        if(fileVM.showClaimType_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getClaimType(), rowFont));
+		        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell4.setBackgroundColor(oddRowColor);
+		        rowCell4.setBorderColor(BaseColor.WHITE);
+		        rowCell4.setBorderWidth(0.1f);
+		        table.addCell(rowCell4);
+	        }
+	        if(fileVM.showClinicName_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getClinicName(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showPcpName_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getPcpName(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showIcdCodes_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getIcdCodes(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showHccCodes_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getHccCodes(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showDrgCode_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getDrgCode(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showBetosCat_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getBetosCat(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        if(fileVM.showCost_beneficiariesManagementByClinicExpand) {
+	        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getCost(), rowFont));
+		        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+		        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        if(count%2 > 0)
+		        rowCell5.setBackgroundColor(oddRowColor);
+		        rowCell5.setBorderColor(BaseColor.WHITE);
+		        rowCell5.setBorderWidth(0.1f);
+		        table.addCell(rowCell5);
+	        }
+	        
+	        count++;
+        }
+        
+        table.setWidthPercentage(100);
+        document.add(table);
+        document.close();
+        InputStream is = new FileInputStream(file);
+        IOUtils.copy(is, os);
+}
+
+
 	public void generateBeneficiariesManagementByDoctorPDF(BeneficiariesManagementByDoctorFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
 		
 		List<BeneficiariesManagementByDoctorPrintDataVM> list = getDataForBeneficiariesManagementByDoctorPrint(fileVM);
@@ -8299,6 +8972,291 @@ public class DashboardServiceImpl implements DashboardService {
 	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
 	      fileOut.close();
 	}
+	
+	public void generateBeneficiariesManagementByLocationExpandReportXLSX(BeneficiariesManagementByLocationReportExpandFileVM fileVM, OutputStream os)  throws IOException {
+
+		Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Beneficiaries Management Details");
+
+	    org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+	    headerFont.setBold(true);
+	    headerFont.setFontHeightInPoints((short) 12);
+
+	    CellStyle headerCellStyle = workbook.createCellStyle();
+	    headerCellStyle.setFont(headerFont);
+	    
+	 // Create a Row
+	    Row headerRow = sheet.createRow(0);
+	    int headerIndex = 0;
+	    
+
+	    if(fileVM.showClaimId_beneficiariesManagementByLocationExpand) {
+	    	Cell cell1 = headerRow.createCell(headerIndex);
+	    	cell1.setCellValue("Claim Id");
+	    	cell1.setCellStyle(headerCellStyle);
+	    }
+	      
+	    if(fileVM.showClaimDate_beneficiariesManagementByLocationExpand) {
+	      Cell cell0 = headerRow.createCell(++headerIndex);
+	      cell0.setCellValue("Claim Date");
+	      cell0.setCellStyle(headerCellStyle);
+	    }
+	      
+	      if(fileVM.showClaimType_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Claim Type");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showClinicName_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Clinic Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showPcpLocation_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("PCP Location");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showIcdCodes_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("ICD Codes");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showHccCodes_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("HCC Codes");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showDrgCode_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("DRG Code");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showBetosCat_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Betos Cat");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showCost_beneficiariesManagementByLocationExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Cost");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      
+	   // Create Other rows and cells
+	      int rowNum = 1;
+	      int rowIndex = 0;
+	      List<BeneficiariesManagementExpandReportPrintDataVM> list = getDataForBeneficiariesManagementByLocationExpandReportPrint(fileVM);
+	      for (BeneficiariesManagementExpandReportPrintDataVM vm : list) {
+	    	  rowIndex = 0;
+	    	  Row row = sheet.createRow(rowNum);
+	    	  
+	    	  if(fileVM.showClaimId_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(rowIndex).setCellValue(vm.getClaimId());
+		      }
+		      
+	    	  if(fileVM.showClaimDate_beneficiariesManagementByLocationExpand) {
+	          	  row.createCell(++rowIndex).setCellValue(vm.getClaimDate());
+	    	  }
+		    
+		      if(fileVM.showClaimType_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getClaimType());
+		      }
+		      
+		      if(fileVM.showClinicName_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getClinicName());
+		      }
+		      
+		      if(fileVM.showPcpLocation_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPcpLocation());
+		      }
+		      
+		      if(fileVM.showIcdCodes_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getIcdCodes());
+		      }
+		      
+		      if(fileVM.showHccCodes_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getHccCodes());
+		      }
+		      
+		      if(fileVM.showDrgCode_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getDrgCode());
+		      }
+		      
+		      if(fileVM.showBetosCat_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getBetosCat());
+		      }
+		      
+		      if(fileVM.showCost_beneficiariesManagementByLocationExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getCost());
+		      }
+		      
+		      rowNum = rowNum + 1;
+		      
+	        }
+	      
+	   // Resize all columns to fit the content size
+	      for(int i=0;i<headerIndex;i++) {
+	    	  sheet.autoSizeColumn(i);
+	      }
+	      FileOutputStream fileOut = new FileOutputStream("Data export-Beneficiaries Management By Location Details.xlsx");
+	      workbook.write(fileOut);
+	      InputStream is = new FileInputStream(new File("Data export-Beneficiaries Management By Location Details.xlsx"));
+	      IOUtils.copy(is, os);
+	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
+	      fileOut.close();
+	}
+	
+	public void generateBeneficiariesManagementByClinicExpandReportXLSX(BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream os)  throws IOException {
+
+		Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Beneficiaries Management Details");
+
+	    org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+	    headerFont.setBold(true);
+	    headerFont.setFontHeightInPoints((short) 12);
+
+	    CellStyle headerCellStyle = workbook.createCellStyle();
+	    headerCellStyle.setFont(headerFont);
+	    
+	 // Create a Row
+	    Row headerRow = sheet.createRow(0);
+	    int headerIndex = 0;
+	    
+
+	    if(fileVM.showClaimId_beneficiariesManagementByClinicExpand) {
+	    	Cell cell1 = headerRow.createCell(headerIndex);
+	    	cell1.setCellValue("Claim Id");
+	    	cell1.setCellStyle(headerCellStyle);
+	    }
+	      
+	    if(fileVM.showClaimDate_beneficiariesManagementByClinicExpand) {
+	      Cell cell0 = headerRow.createCell(++headerIndex);
+	      cell0.setCellValue("Claim Date");
+	      cell0.setCellStyle(headerCellStyle);
+	    }
+	      
+	      if(fileVM.showClaimType_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Claim Type");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showClinicName_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Clinic Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showPcpName_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("PCP Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showIcdCodes_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("ICD Codes");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showHccCodes_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("HCC Codes");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showDrgCode_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("DRG Code");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showBetosCat_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Betos Cat");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showCost_beneficiariesManagementByClinicExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Cost");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      
+	   // Create Other rows and cells
+	      int rowNum = 1;
+	      int rowIndex = 0;
+	      List<BeneficiariesManagementExpandReportPrintDataVM> list = getDataForBeneficiariesManagementByClinicExpandReportPrint(fileVM);
+	      for (BeneficiariesManagementExpandReportPrintDataVM vm : list) {
+	    	  rowIndex = 0;
+	    	  Row row = sheet.createRow(rowNum);
+	    	  
+	    	  if(fileVM.showClaimId_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(rowIndex).setCellValue(vm.getClaimId());
+		      }
+		      
+	    	  if(fileVM.showClaimDate_beneficiariesManagementByClinicExpand) {
+	          	  row.createCell(++rowIndex).setCellValue(vm.getClaimDate());
+	    	  }
+		    
+		      if(fileVM.showClaimType_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getClaimType());
+		      }
+		      
+		      if(fileVM.showClinicName_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getClinicName());
+		      }
+		      
+		      if(fileVM.showPcpName_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPcpName());
+		      }
+		      
+		      if(fileVM.showIcdCodes_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getIcdCodes());
+		      }
+		      
+		      if(fileVM.showHccCodes_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getHccCodes());
+		      }
+		      
+		      if(fileVM.showDrgCode_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getDrgCode());
+		      }
+		      
+		      if(fileVM.showBetosCat_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getBetosCat());
+		      }
+		      
+		      if(fileVM.showCost_beneficiariesManagementByClinicExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getCost());
+		      }
+		      
+		      rowNum = rowNum + 1;
+		      
+	        }
+	      
+	   // Resize all columns to fit the content size
+	      for(int i=0;i<headerIndex;i++) {
+	    	  sheet.autoSizeColumn(i);
+	      }
+	      FileOutputStream fileOut = new FileOutputStream("Data export-Beneficiaries Management By Location Details.xlsx");
+	      workbook.write(fileOut);
+	      InputStream is = new FileInputStream(new File("Data export-Beneficiaries Management By Location Details.xlsx"));
+	      IOUtils.copy(is, os);
+	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
+	      fileOut.close();
+	}
+
 	
 	public void generateBeneficiariesManagementByDoctorXLSX(BeneficiariesManagementByDoctorFileVM fileVM, OutputStream os)  throws IOException {
 

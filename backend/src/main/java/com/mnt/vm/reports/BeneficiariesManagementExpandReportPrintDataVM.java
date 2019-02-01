@@ -16,6 +16,17 @@ public class BeneficiariesManagementExpandReportPrintDataVM {
 	@JsonProperty("Clinic Name")
 	public String clinicName;
 	
+	@JsonProperty("PCP Location")
+	public String pcpLocation;
+	
+	public String getPcpLocation() {
+		return pcpLocation;
+	}
+
+	public void setPcpLocation(String pcpLocation) {
+		this.pcpLocation = pcpLocation;
+	}
+
 	@JsonProperty("PCP Name")
 	public String pcpName;
 	

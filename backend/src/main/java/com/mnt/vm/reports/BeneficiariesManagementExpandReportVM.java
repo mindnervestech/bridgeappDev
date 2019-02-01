@@ -12,7 +12,14 @@ public class BeneficiariesManagementExpandReportVM {
 	public String drgCode;
 	public String betosCat;
 	public String cost;
+	public String pcpLocation;
 	
+	public String getPcpLocation() {
+		return pcpLocation;
+	}
+	public void setPcpLocation(String pcpLocation) {
+		this.pcpLocation = pcpLocation;
+	}
 	public String getClaimId() {
 		return claimId;
 	}

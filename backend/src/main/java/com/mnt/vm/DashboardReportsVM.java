@@ -31,11 +31,37 @@ public class DashboardReportsVM {
 	public List<PmpmByPracticeExpandReportVM> pmpmByPracticeExpandData;
 	public List<PatientVisitExpandReportVM> patientVisitExpandReportData;
 	public List<BeneficiariesManagementReportVM> beneficiariesManagementData;
-	public List<BeneficiariesManagementByLocationReportVM> BeneficiariesManagementByLocationData;
-	public List<BeneficiariesManagementByClinicReportVM> BeneficiariesManagementByClinicData;
+	public List<BeneficiariesManagementByLocationReportVM>BeneficiariesManagementByLocationData;
+		public List<BeneficiariesManagementByClinicReportVM> BeneficiariesManagementByClinicData;
+	public List<BeneficiariesManagementByLocationReportVM> getBeneficiariesManagementByLocationData() {
+		return BeneficiariesManagementByLocationData;
+	}
+	public void setBeneficiariesManagementByLocationData(
+			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
+		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
+	}
 	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementExpandData;
 	public List<DuplicateClaimsExpandVM> duplicateClaimsExpandData;
 	public List<BeneficiariesManagementByDoctorReportVM> beneficiariesManagementByDoctorData;
+	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByLocationExpandData;
+	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByClinicExpandData;
+	
+	
+	
+	public List<BeneficiariesManagementExpandReportVM> getBeneficiariesManagementByClinicExpandData() {
+		return beneficiariesManagementByClinicExpandData;
+	}
+	public void setBeneficiariesManagementByClinicExpandData(
+			List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByClinicExpandData) {
+		this.beneficiariesManagementByClinicExpandData = beneficiariesManagementByClinicExpandData;
+	}
+	public List<BeneficiariesManagementExpandReportVM> getBeneficiariesManagementByLocationExpandData() {
+		return beneficiariesManagementByLocationExpandData;
+	}
+	public void setBeneficiariesManagementByLocationExpandData(
+			List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByLocationExpandData) {
+		this.beneficiariesManagementByLocationExpandData = beneficiariesManagementByLocationExpandData;
+	}
 	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByDoctorExpandData;
 	public Integer pages;
 	public Integer totalCount;

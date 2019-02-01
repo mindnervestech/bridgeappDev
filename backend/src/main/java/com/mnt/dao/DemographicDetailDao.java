@@ -14,5 +14,7 @@ public interface DemographicDetailDao extends BaseDao<DemographicDetail>{
 	public ReportResponseVM getBeneficiariesManagementExpandReportData(ReportVM vm);
 	public ReportResponseVM getBeneficiariesManagementByDoctorExpandReportData(ReportVM vm);
 	public ReportResponseVM getBeneficiariesManagementByLocationReportData(ReportVM vm);
+	public ReportResponseVM getBeneficiariesManagementByLocationExpandReportData(ReportVM vm);
 	public ReportResponseVM getBeneficiariesManagementByClinicReportData(ReportVM vm);
+	public ReportResponseVM getBeneficiariesManagementByClinicExpandReportData(ReportVM vm);
 }
