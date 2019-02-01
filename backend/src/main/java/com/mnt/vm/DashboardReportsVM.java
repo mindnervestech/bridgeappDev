@@ -204,11 +204,4 @@ public class DashboardReportsVM {
 			List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByDoctorExpandData) {
 		this.beneficiariesManagementByDoctorExpandData = beneficiariesManagementByDoctorExpandData;
 	}
-	public List<BeneficiariesManagementByLocationReportVM> getBeneficiariesManagementByLocationData() {
-		return BeneficiariesManagementByLocationData;
-	}
-	public void setBeneficiariesManagementByLocationData(
-			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
-		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
-	}
 }
