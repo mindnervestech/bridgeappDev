@@ -738,8 +738,7 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPmpm("$"+formatter.format(Double.parseDouble(obj[3].toString())));
 			if(obj[4] != null)
 				dataVM.setPmpy("$"+formatter.format(Double.parseDouble(obj[4].toString())));
-			if(obj[0] != null)
-				dataVM.setPcpId(obj[5].toString());
+			
 			list.add(dataVM);
 		}
 		gridVM.setPmpmByPracticeData(list);
@@ -1277,10 +1276,10 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setSpecialityType(obj[1].toString());
 			if(obj[2] != null)
 				dataVM.setNumberOfClaims(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[3].toString())));
 			if(obj[4] != null)
-				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[4].toString())));
-			if(obj[5] != null)
-				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[4].toString())));
 			
 			list.add(dataVM);
 		}

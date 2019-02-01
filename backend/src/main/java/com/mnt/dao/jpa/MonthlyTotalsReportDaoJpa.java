@@ -579,10 +579,11 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		
 			if(!filterStr.equals("") && conditionStr.equals(""))
 				filterStr = " where "+filterStr.substring(4);
-			queryStr = "select pcp_name,round(sum(total_expenses)+constant_val*sum(membership),0) as totalCost,sum(membership) as totalNumberOfMemberMonth,\n" + 
+			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy from (\n"+
+					"select pcp_name,round(sum(total_expenses)+constant_val*sum(membership),0) as totalCost,sum(membership) as totalNumberOfMemberMonth,\n" + 
 					"round((sum(total_expenses)+constant_val*sum(membership))/sum(membership),0) as pmpm,\n" + 
 					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id from monthly_totals_data \n" + 
-					conditionStr+" "+filterStr+" group by pcp_name,constant_val,pcp_id"+havingStr;
+					conditionStr+" "+filterStr+" group by pcp_name,constant_val,pcp_id) A group by pcp_name "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
@@ -701,14 +702,14 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		
 		if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
 			queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-					+ " where pcp_id="+'\''+vm.getPcpId()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
+					+ " where pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
 		} else {
 			if(vm.getProvider().equals("all")) {
 				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-						+ " where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
+						+ " where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 
@@ -717,7 +718,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			if(vm.getYear().equals("all")) {
 				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
 						+ " where provider="+'\''+vm.getProvider()+'\''+
-						" and pcp_id="+'\''+vm.getPcpId()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
+						" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 
@@ -727,7 +728,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				
 				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
 						+ " where provider="+'\''+vm.getProvider()+'\''+" and \n" + 
-						"eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
+						"eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 

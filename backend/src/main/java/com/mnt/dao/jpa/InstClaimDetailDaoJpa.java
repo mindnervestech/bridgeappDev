@@ -2533,8 +2533,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " order by member_name limit "+start+","+end;
-		String sortCountQryStr = " order by member_name";
+		String sortQryStr = " order by paid_amount desc limit "+start+","+end;
+		String sortCountQryStr = " order by paid_amount ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -2567,7 +2567,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 					"select medicare_id, plan_name, principal_diagnosis, member_name, pcp_name, service_month, first_service_date, paid_amount, count(*) as number,'INST' as claimType from inst_claim_detail \n" + 
 					conditionStr+
 					" group by medicare_id, paid_amount, pcp_name, plan_name, member_name, principal_diagnosis, first_service_date, service_month \n" + 
-					") A where number > 1 "+filterStr;
+					") A where number > 1 and paid_amount > 0 "+filterStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + 
@@ -3573,7 +3573,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
+		String sortQryStr = " order by cost desc limit "+start+","+end;
 		String sortCountQryStr = "";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
@@ -3596,8 +3596,10 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		}
 		
 		
-		queryStr = "select provider_name,claim_specialty,count(distinct claim_id) as noOfClaims,member_name,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost from prof_claim_detail \n" + 
-					"where claim_specialty="+'\''+vm.getSpeciality()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,provider_name "+havingStr;
+		queryStr ="select provider_name,claim_specialty,sum(noOfClaims) as noOfClaims,round(sum(cost)/sum(noOfClaims),2) as avgCost,sum(cost) as cost from ("+ 
+				"select provider_name,claim_specialty,count(distinct claim_id) as noOfClaims,member_name,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost from prof_claim_detail \n" + 
+					"where claim_specialty="+'\''+vm.getSpeciality()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,provider_name "+havingStr
+					+"\n ) A group by provider_name ";
 		
 		countQueryStr = "select count(*) from \n" + 
 				"(\n" + 
