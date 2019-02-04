@@ -15,4 +15,5 @@ public interface MonthlyTotalsReportDao extends BaseDao<MonthlyTotalsReport> {
 	public ReportResponseVM getSettledMonthsReportData(ReportVM vm);
 	public ReportResponseVM getPmpmByPracticeReportData(ReportVM vm);
 	public ReportResponseVM getPmpmByPracticeExpandReportData(ReportVM vm);
+	public ReportResponseVM reinsuranceMangementReportData(ReportVM vm);
 }

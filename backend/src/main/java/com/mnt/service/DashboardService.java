@@ -50,6 +50,8 @@ import com.mnt.vm.reports.PmpmByPracticeExpandReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeExpandReportPrintDataVM;
 import com.mnt.vm.reports.PmpmByPracticeReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeReportPrintDataVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportFileVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsReportFileVM;
@@ -145,6 +147,11 @@ public interface DashboardService {
 	public void generateSpecialistComparisonReportXLSX(SpecialistComparisonReportFileVM fileVM, OutputStream os)  throws IOException;
 	public void generateSpecialistComparisonExpandReportXLSX(SpecialistComparisonExpandReportFileVM fileVM, OutputStream os)  throws IOException;
 	public void generateSummaryReportXLSX(SummaryReportFileVM fileVM, OutputStream os)  throws IOException;
+	public DashboardReportsVM getReinsuranceManagementData(ReportVM vm);
+	public void generateReinsuranceManagementReportXLSX(ReinsuranceManagementReportFileVM fileVM, OutputStream outputStream) throws IOException;
+	public void generateReisuranceManagementReportPDF(ReinsuranceManagementReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public List<ReinsuranceManagementReportPrintDataVM> getDataForReinsuranceManagementReportPrint(
+			ReinsuranceManagementReportFileVM vm);
 	public DashboardReportsVM getBeneficiariesManagementByLocationReportData(ReportVM vm);
 	public DashboardReportsVM getBeneficiariesManagementByClinicReportData(ReportVM vm);
 	public List<BeneficiariesManagementByLocationReportPrintDataVM> getDataForBeneficiariesManagementByLocationReportPrint(

@@ -112,6 +112,9 @@ import com.mnt.vm.reports.PmpmByPracticeExpandReportVM;
 import com.mnt.vm.reports.PmpmByPracticeReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeReportPrintDataVM;
 import com.mnt.vm.reports.PmpmByPracticeReportVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportFileVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportPrintDataVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportVM;
@@ -715,6 +718,46 @@ public class DashboardServiceImpl implements DashboardService {
 		gridVM.setTotalCount(responseVM.getTotalCount());
 		gridVM.setFileQuery(responseVM.getFileQuery());
 		return gridVM;
+	}
+	public DashboardReportsVM getReinsuranceManagementData(ReportVM vm) {
+	
+		DecimalFormat formatter = new DecimalFormat("#,###");
+		List<Object[]> resultData = null;
+		Integer noOfPages = 0;
+		List<ReinsuranceManagementReportVM> list = new ArrayList<>();
+		DashboardReportsVM gridVM = new DashboardReportsVM();
+		ReportResponseVM responseVM = monthlyTotalsReportDao.reinsuranceMangementReportData(vm);
+		resultData = responseVM.getDataList();
+		noOfPages = responseVM.getNoOfPages();
+		
+		for(Object[] obj: resultData) {
+			ReinsuranceManagementReportVM dataVM = new ReinsuranceManagementReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setPlanName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setPatientName(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setTermedMonth(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setPcpName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setHicn(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setInstClaims("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+			if(obj[6] != null)
+				dataVM.setProfClaims("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			if(obj[7] != null)
+				dataVM.setTotalCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			list.add(dataVM);
+		}
+		gridVM.setReinsuranceManagementData(list);
+		gridVM.setPages(noOfPages);
+		gridVM.setTotalCount(responseVM.getTotalCount());
+		gridVM.setFileQuery(responseVM.getFileQuery());
+		return gridVM;
+		
+		
 	}
 	
 	public DashboardReportsVM getPmpmByPracticeReportData(ReportVM vm) {
@@ -3706,7 +3749,212 @@ public class DashboardServiceImpl implements DashboardService {
 	        IOUtils.copy(is, os);
 	}
 	
-	public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+	public void generateReisuranceManagementReportPDF(ReinsuranceManagementReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+		
+		List<ReinsuranceManagementReportPrintDataVM> list = getDataForReinsuranceManagementReportPrint(fileVM);
+		
+		File file = new File("Data export-Reinsurance Management Report.pdf");
+		 Document document = new Document();
+	        PdfWriter.getInstance(document, new FileOutputStream(file));
+	        document.open();
+	        
+	        int tableColumnSize = 0;
+	        if(fileVM.showSubscriberID_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showPlanName_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showPatientName_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showPcpName_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showTermedMonth_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showInstClaims_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showProfClaims_reinsuranceManagement)
+	        	tableColumnSize++;
+	        if(fileVM.showTotalCost_reinsuranceManagement)
+	        	tableColumnSize++;
+	        
+	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+	        
+	        @SuppressWarnings("deprecation")
+			BaseColor myColor = WebColors.getRGBColor("#2D4154");
+	        
+	        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+	        if(fileVM.showSubscriberID_reinsuranceManagement) {
+	        	PdfPCell cell3 = new PdfPCell(new Paragraph("SusbcriberID", font));
+	        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell3.setBackgroundColor(myColor);
+		        cell3.setBorderColor(BaseColor.WHITE);
+		        cell3.setBorderWidth(0.1f);
+	        	table.addCell(cell3);
+	        }
+	        if(fileVM.showPlanName_reinsuranceManagement) {
+		        PdfPCell cell1 = new PdfPCell(new Paragraph("Plan Name Name", font));
+		        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell1.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell1.setBackgroundColor(myColor);
+		        cell1.setBorderColor(BaseColor.WHITE);
+		        cell1.setBorderWidth(0.1f);
+		        table.addCell(cell1);
+	        }
+	        if(fileVM.showPatientName_reinsuranceManagement) {
+	        	PdfPCell cell4 = new PdfPCell(new Paragraph("Patient Name", font));
+	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell4.setBackgroundColor(myColor);
+		        cell4.setBorderColor(BaseColor.WHITE);
+		        cell4.setBorderWidth(0.1f);
+	        	table.addCell(cell4);
+	        }
+	        if(fileVM.showPcpName_reinsuranceManagement) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("PCP Name", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showTermedMonth_reinsuranceManagement) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("Termed Month", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showInstClaims_reinsuranceManagement) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("INST Claims", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showProfClaims_reinsuranceManagement) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("PROF Claims", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showTotalCost_reinsuranceManagement) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Cost", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        table.setHeaderRows(1);
+	        
+	        BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+	        
+	        int count = 1; //table rows
+	        for(ReinsuranceManagementReportPrintDataVM vm: list) {
+	        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+	        	if(fileVM.showSubscriberID_reinsuranceManagement) {
+		        	PdfPCell rowCell3 = new PdfPCell(new Paragraph(vm.getHicn(), rowFont));
+			        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell3.setBackgroundColor(oddRowColor);
+			        rowCell3.setBorderColor(BaseColor.WHITE);
+			        rowCell3.setBorderWidth(0.1f);
+			        table.addCell(rowCell3);
+		        }
+	        	if(fileVM.showPlanName_reinsuranceManagement) {
+			        PdfPCell rowCell1 = new PdfPCell(new Paragraph(vm.getPlanName(), rowFont));
+			        rowCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell1.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell1.setBackgroundColor(oddRowColor);
+			        rowCell1.setBorderColor(BaseColor.WHITE);
+			        rowCell1.setBorderWidth(0.1f);
+			        table.addCell(rowCell1);
+	        	}
+		        if(fileVM.showPatientName_reinsuranceManagement) {
+		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getPatientName(), rowFont));
+			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell4.setBackgroundColor(oddRowColor);
+			        rowCell4.setBorderColor(BaseColor.WHITE);
+			        rowCell4.setBorderWidth(0.1f);
+			        table.addCell(rowCell4);
+		        }
+		        if(fileVM.showPcpName_reinsuranceManagement) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getPcpName(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showTermedMonth_reinsuranceManagement) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getTermedMonth(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showInstClaims_reinsuranceManagement) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getInstClaims(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showProfClaims_reinsuranceManagement) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getProfClaims(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showTotalCost_reinsuranceManagement) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getTotalCost(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        
+		        count++;
+	        }
+	        
+	        table.setWidthPercentage(100);
+	        document.add(table);
+	        document.close();
+	        InputStream is = new FileInputStream(file);
+	        IOUtils.copy(is, os);
+	}
+	
+	
+public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
 		
 		List<PmpmByPracticeReportPrintDataVM> list = getDataForPmpmByPracticeReportPrint(fileVM);
 		
@@ -8144,6 +8392,125 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      fileOut.close();
 	}
 	
+	public void generateReinsuranceManagementReportXLSX(ReinsuranceManagementReportFileVM fileVM, OutputStream os)  throws IOException {
+
+		Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Reinsurance Management Report");
+
+	    org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+	    headerFont.setBold(true);
+	    headerFont.setFontHeightInPoints((short) 12);
+
+	    CellStyle headerCellStyle = workbook.createCellStyle();
+	    headerCellStyle.setFont(headerFont);
+	    
+	 // Create a Row
+	    Row headerRow = sheet.createRow(0);
+	    int headerIndex = 0;
+	    
+
+	    	if(fileVM.showSubscriberID_reinsuranceManagement) {
+	    		Cell cell1 = headerRow.createCell(headerIndex);
+	    		cell1.setCellValue("SubscriberID");
+	    		cell1.setCellStyle(headerCellStyle);
+	    	}
+	      
+	    	if(fileVM.showPlanName_reinsuranceManagement) {
+	    		Cell cell0 = headerRow.createCell(++headerIndex);
+	    		cell0.setCellValue("Plan Name");
+	    		cell0.setCellStyle(headerCellStyle);
+	    	}
+	      
+	      if(fileVM.showPatientName_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Patient Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showPcpName_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("PCP Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      if(fileVM.showTermedMonth_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Termed Month");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      if(fileVM.showInstClaims_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("INST Claims");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      if(fileVM.showProfClaims_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("PROF Claims");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }	      
+	      if(fileVM.showTotalCost_reinsuranceManagement) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Total Cost");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      
+	   // Create Other rows and cells
+	      int rowNum = 1;
+	      int rowIndex = 0;
+	      List<ReinsuranceManagementReportPrintDataVM> list = getDataForReinsuranceManagementReportPrint(fileVM);
+	      for (ReinsuranceManagementReportPrintDataVM vm : list) {
+	    	  rowIndex = 0;
+	    	  Row row = sheet.createRow(rowNum);
+	    	  
+	    	  if(fileVM.showSubscriberID_reinsuranceManagement) {
+		    	  row.createCell(rowIndex).setCellValue(vm.getHicn());
+		      }
+		      
+	    	  if(fileVM.showPlanName_reinsuranceManagement) {
+	          	  row.createCell(++rowIndex).setCellValue(vm.getPlanName());
+	    	  }
+		    
+		      if(fileVM.showPatientName_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPatientName());
+		      }
+		      
+		      if(fileVM.showPcpName_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPcpName());
+		      }
+		      
+		      if(fileVM.showTermedMonth_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getTermedMonth());
+		      }
+		      if(fileVM.showInstClaims_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getInstClaims());
+		      }
+		      if(fileVM.showProfClaims_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getProfClaims());
+		      }
+		      
+		      if(fileVM.showTotalCost_reinsuranceManagement) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getTotalCost());
+		      }
+		      
+		      rowNum = rowNum + 1;
+		      
+	        }
+	      
+	   // Resize all columns to fit the content size
+	      for(int i=0;i<headerIndex;i++) {
+	    	  sheet.autoSizeColumn(i);
+	      }
+	      FileOutputStream fileOut = new FileOutputStream("Data export-Reinsurance Management Report.xlsx");
+	      workbook.write(fileOut);
+	      InputStream is = new FileInputStream(new File("Data export-Reinsurance Management Report.xlsx"));
+	      IOUtils.copy(is, os);
+	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
+	      fileOut.close();
+	}
+	
+
+	
+
 	public void generatePmpmByPracticeReportXLSX(PmpmByPracticeReportFileVM fileVM, OutputStream os)  throws IOException {
 
 		Workbook workbook = new XSSFWorkbook();

@@ -74,6 +74,8 @@ import com.mnt.vm.reports.PmpmByPracticeExpandReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeExpandReportPrintDataVM;
 import com.mnt.vm.reports.PmpmByPracticeReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeReportPrintDataVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportFileVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsReportFileVM;
@@ -216,6 +218,13 @@ public class DashboardController {
 		return dashboardService.getPmpmByPracticeReportData(vm);
     }
 	
+	@RequestMapping(value="/getReinsuranceManagementData", method =RequestMethod.POST)
+	@ResponseBody
+	public DashboardReportsVM getReinsuranceManagementData(ReportVM vm)
+	{
+		return dashboardService.getReinsuranceManagementData(vm);
+	}
+	
 	@RequestMapping(value="/getBeneficiariesManagementData",method = RequestMethod.POST)
 	@ResponseBody
     public DashboardReportsVM getBeneficiariesManagementData(ReportVM vm) {
@@ -346,6 +355,12 @@ public class DashboardController {
 	@ResponseBody
     public List<PmpmByPracticeReportPrintDataVM> getPmpmByPracticeReportDataForPrint(PmpmByPracticeReportFileVM vm) {
 		return dashboardService.getDataForPmpmByPracticeReportPrint(vm);
+    }
+	
+	@RequestMapping(value="/getReinsuranceManagementReportDataForPrint",method = RequestMethod.POST)
+	@ResponseBody
+    public List<ReinsuranceManagementReportPrintDataVM> getReinsuranceManagementReportDataForPrint(ReinsuranceManagementReportFileVM vm) {
+		return dashboardService.getDataForReinsuranceManagementReportPrint(vm);
     }
 	
 	@RequestMapping(value="/getBeneficiariesManagementDataForPrint",method = RequestMethod.POST)
@@ -1115,6 +1130,33 @@ public class DashboardController {
 		return csv;
 	}
 	
+	@RequestMapping(value="/renderReinsuranceManagementReportXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderReinsuranceManagementReportXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		ReinsuranceManagementReportFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), ReinsuranceManagementReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Management Report" + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateReinsuranceManagementReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
 	@RequestMapping(value="/renderPmpmByPracticeReportPDF/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderPmpmByPracticeReportPDF(@PathVariable String json, HttpServletResponse response) {
@@ -1142,6 +1184,34 @@ public class DashboardController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderReinsuranceManagementReportPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderReinsuranceManagementReportPDF(@PathVariable String json, HttpServletResponse response) throws DocumentException, SQLException {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ReinsuranceManagementReportFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), ReinsuranceManagementReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Management Report" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateReisuranceManagementReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return csv;

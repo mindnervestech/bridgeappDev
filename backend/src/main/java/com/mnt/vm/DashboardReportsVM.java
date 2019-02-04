@@ -11,6 +11,7 @@ import com.mnt.vm.reports.DuplicateClaimsExpandVM;
 import com.mnt.vm.reports.PatientVisitExpandReportVM;
 import com.mnt.vm.reports.PmpmByPracticeExpandReportVM;
 import com.mnt.vm.reports.PmpmByPracticeReportVM;
+import com.mnt.vm.reports.ReinsuranceManagementReportVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportVM;
 import com.mnt.vm.reports.SettledMonthsReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportVM;
@@ -27,6 +28,11 @@ public class DashboardReportsVM {
 	public List<SettledMonthsReportVM> settledMonthsData;
 	public List<SettledMonthsExpandReportVM> settledMonthsExpandData;
 	public List<PmpmByPracticeReportVM> pmpmByPracticeData;
+	public List<ReinsuranceManagementReportVM> reinsuranceManagementData;
+	
+	public List<ReinsuranceManagementReportVM> getReinsuranceManagementData() {
+		return reinsuranceManagementData;
+	}
 	public List<MembershipManagementPatientTypeVM> membershipManagementData;
 	public List<PmpmByPracticeExpandReportVM> pmpmByPracticeExpandData;
 	public List<PatientVisitExpandReportVM> patientVisitExpandReportData;
@@ -145,6 +151,9 @@ public class DashboardReportsVM {
 	}
 	public void setPmpmByPracticeData(List<PmpmByPracticeReportVM> pmpmByPracticeData) {
 		this.pmpmByPracticeData = pmpmByPracticeData;
+	}
+	public void setReinsuranceManagementData(List<ReinsuranceManagementReportVM> reinsuranceManagementData) {
+		this.reinsuranceManagementData=reinsuranceManagementData;
 	}
 	public List<MembershipManagementPatientTypeVM> getMembershipManagementData() {
 		return membershipManagementData;

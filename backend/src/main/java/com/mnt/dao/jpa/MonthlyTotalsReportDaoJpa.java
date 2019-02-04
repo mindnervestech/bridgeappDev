@@ -489,6 +489,169 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		responseVM.setFileQuery(fileQuery);
 		return responseVM;
 	}
+
+	public ReportResponseVM reinsuranceMangementReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "", havingStr = "";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			filterColumnName = filteredList.get(i).getId();
+			
+			if(filterColumnName.equals("hicn")) {
+				filterColumnName = "medicare_id";
+			}
+			if(filterColumnName.equals("planName")) {
+				filterColumnName = "plan_name";
+			}if(filterColumnName.equals("patientName")) {
+				filterColumnName = "member_name";
+			}if(filterColumnName.equals("pcpName")) {
+				filterColumnName = "pcp_name";
+			}
+			if(filterColumnName.equals("instClaims")) {
+				filterColumnName = "inst_claims";
+			}
+			if(filterColumnName.equals("profClaims")) {
+				filterColumnName = "prof_claims";
+			}
+			
+			if(filterColumnName.equals("termedMonth")) {
+				filterColumnName = "service_month";
+			}
+			if(filterColumnName.equals("totalCost")) {
+				filterColumnName = "total";
+			}
+			
+				if(!filterColumnName.equals("") && !filterColumnName.equals("pcp_name")) {
+					if(!havingStr.equals("")) {
+						havingStr += "and ";
+					} else {
+						havingStr = " having ";
+					}
+					havingStr += filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+				} else {
+					if(!filterColumnName.equals(""))
+					filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+				}
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			
+			sortColName = sortedList.get(0).getId();
+			if(sortColName.equals("hicn"))
+				sortColName = "medicare_id";
+			if(sortColName.equals("planName"))
+				sortColName = "plan_name";
+			if(sortColName.equals("patientName"))
+				sortColName = "member_name";
+			if(sortColName.equals("pcpName"))
+				sortColName = "pcp_name";
+			if(sortColName.equals("termedMonth"))
+				sortColName = "service_month";
+			if(sortColName.equals("instClaims"))
+					sortColName="inst_claims";
+			if(sortColName.equals("profClaims"))
+				sortColName="prof_claims";
+		
+			if(sortColName.equals("totalCost"))
+				sortColName = "total";
+			
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "",conditionStr = "";
+		
+		if(!vm.getProvider().equals("all")) {
+			conditionStr = conditionStr + " and provider="+'\''+vm.getProvider()+'\'';
+		}
+		if(!vm.getPcpName().equals("all")) {
+			if(!vm.getProvider().equals("all"))
+				conditionStr = conditionStr + " and pcp_id="+'\''+vm.getPcpName()+'\'';
+			else 
+				conditionStr = conditionStr + " and pcp_name="+'\''+vm.getPcpName()+'\'';
+		}
+		System.out.println(vm.getYear());
+		if(!vm.getYear().equals("all")) {
+			conditionStr = conditionStr + " and eligible_month like "+'\''+vm.getYear()+"%"+'\'';
+		}
+		
+		if(!conditionStr.equals("")) {
+			conditionStr = " where "+conditionStr.substring(4);
+		}
+		
+			if(!filterStr.equals("") && conditionStr.equals(""))
+				filterStr = " where "+filterStr.substring(4);
+			
+			queryStr = "select C.*, COALESCE(round((inst_claims + prof_claims),0),0) as total from (\r\n" + 
+					"select B.*, COALESCE(round(sum(pcd.paid_amount),0),0) as prof_claims from (\r\n" + 
+					"select A.*, COALESCE(round(sum(icd.paid_amount),0),0) as inst_claims  from (\r\n" + 
+					"select distinct max(dd.plan_name) planName,concat(dd.last_name,' ',dd.first_name) as memberName,min(dd.eligible_month) as eligibleMonth,min(dd.pcp_name) as pcpName,\r\n" + 
+					"dd.medicare_id \r\n" + 
+					"from demographic_detail dd \r\n" + 
+					conditionStr+" "+filterStr+" group by dd.medicare_id,memberName\r\n" + 
+					") A\r\n" + 
+					" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id \r\n" + 
+					"group by A.eligibleMonth, A.pcpName, A.medicare_id, A.memberName 	\r\n" + 
+					") B \r\n" + 
+					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
+					"group by B.eligibleMonth, B.pcpName, B.medicare_id,B.memberName \r\n" +havingStr+ 
+					") C having total>10000 ";
+			
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + queryStr;
+		
+		System.out.println(queryStr+sortQryStr);
+		System.out.println(countQueryStr+sortCountQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		
+		String fileQuery = queryStr+sortCountQryStr;
+		
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
+	
 	
 	public ReportResponseVM getPmpmByPracticeReportData(ReportVM vm) {
 		ReportResponseVM responseVM = new ReportResponseVM();
