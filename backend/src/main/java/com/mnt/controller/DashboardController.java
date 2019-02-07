@@ -74,6 +74,8 @@ import com.mnt.vm.reports.PmpmByPracticeExpandReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeExpandReportPrintDataVM;
 import com.mnt.vm.reports.PmpmByPracticeReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeReportPrintDataVM;
+import com.mnt.vm.reports.ReinsuranceCostReportFileVM;
+import com.mnt.vm.reports.ReinsuranceCostReportPrintDataVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportFileVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
@@ -225,6 +227,13 @@ public class DashboardController {
 		return dashboardService.getReinsuranceManagementData(vm);
 	}
 	
+	@RequestMapping(value="/getReinsuranceCostReportData", method =RequestMethod.POST)
+	@ResponseBody
+	public DashboardReportsVM getReinsuranceCostReportData(ReportVM vm)
+	{
+		return dashboardService.getReinsuranceCostReportData(vm);
+	}
+	
 	@RequestMapping(value="/getBeneficiariesManagementData",method = RequestMethod.POST)
 	@ResponseBody
     public DashboardReportsVM getBeneficiariesManagementData(ReportVM vm) {
@@ -361,6 +370,12 @@ public class DashboardController {
 	@ResponseBody
     public List<ReinsuranceManagementReportPrintDataVM> getReinsuranceManagementReportDataForPrint(ReinsuranceManagementReportFileVM vm) {
 		return dashboardService.getDataForReinsuranceManagementReportPrint(vm);
+    }
+	
+	@RequestMapping(value="/getReinsuranceCostReportDataForPrint",method = RequestMethod.POST)
+	@ResponseBody
+    public List<ReinsuranceCostReportPrintDataVM> getReinsuranceCostReportDataForPrint(ReinsuranceCostReportFileVM vm) {
+		return dashboardService.getDataForReinsuranceCostReportPrint(vm);
     }
 	
 	@RequestMapping(value="/getBeneficiariesManagementDataForPrint",method = RequestMethod.POST)
@@ -1148,7 +1163,33 @@ public class DashboardController {
 	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Management Report" + ".xlsx\"");
 		try {
 			OutputStream outputStream = response.getOutputStream();
-			dashboardService.generateReinsuranceManagementReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderReinsuranceCostReportXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderReinsuranceCostReportXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		ReinsuranceCostReportFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), ReinsuranceCostReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Cost Report" + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateReinsuranceCostReportXLSX(fileVM,outputStream);
 			outputStream.close();
 			response.flushBuffer();
 		} catch (IOException e) {
@@ -1209,6 +1250,34 @@ public class DashboardController {
 		try {
 			OutputStream outputStream = response.getOutputStream();
 			dashboardService.generateReisuranceManagementReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderReinsuranceCostPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderReinsuranceCostReportPDF(@PathVariable String json, HttpServletResponse response) throws DocumentException, SQLException {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ReinsuranceCostReportFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), ReinsuranceCostReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Cost Report" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateCostManagementReportPDF(fileVM,outputStream);
 			outputStream.close();
 			response.flushBuffer();
 		} catch (IOException e) {

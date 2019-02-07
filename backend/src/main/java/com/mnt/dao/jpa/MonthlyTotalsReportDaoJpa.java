@@ -652,6 +652,172 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		return responseVM;
 	}
 	
+	public ReportResponseVM reinsuranceCostReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "", havingStr = "", filterString="";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			filterColumnName = filteredList.get(i).getId();
+			
+			if(filterColumnName.equals("planName")) {
+				filterColumnName = "planName";
+			}if(filterColumnName.equals("policyPeriod")) {
+				filterColumnName = "";
+			}if(filterColumnName.equals("patientLastName")) {
+				filterColumnName = "last_name";
+			}if(filterColumnName.equals("patientFirstName")) {
+				filterColumnName = "first_name";
+			}if(filterColumnName.equals("subscriberID")) {
+				filterColumnName = "medicare_id";
+			}if(filterColumnName.equals("effectiveDate")) {
+				filterColumnName = "eligibleMonth";
+			}if(filterColumnName.equals("termedMonth")) {
+				filterColumnName = "";
+			}if(filterColumnName.equals("dob")) {	
+				filterColumnName="birth_date";
+			}if(filterColumnName.equals("status")) {	
+				filterColumnName="";
+			}if(filterColumnName.equals("gender")) {	
+				filterColumnName="gender";
+			}if(filterColumnName.equals("pcpName")) {	
+				filterColumnName="pcpName";
+			}if(filterColumnName.equals("totalClaimsCost")) {	
+				filterColumnName="total";
+			}
+				
+			
+			if(!filterColumnName.equals("")) {	
+					
+				havingStr += " and "+ filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+				} 	else {
+					if(!filterColumnName.equals(""))
+					filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+				}
+			
+				
+				
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			
+			sortColName = sortedList.get(0).getId();
+			if(sortColName.equals("planName"))
+				sortColName = "planName";
+			if(sortColName.equals("patientLastName"))
+				sortColName = "last_name";
+			if(sortColName.equals("patientFirstName"))
+				sortColName = "first_name";
+			if(sortColName.equals("subscriberID"))
+				sortColName = "medicare_id";
+			if(sortColName.equals("effectiveDate"))
+				sortColName = "eligibleMonth";
+			if(sortColName.equals("dob"))
+					sortColName="birth_date";
+			if(sortColName.equals("gender"))
+				sortColName="gender";
+		
+			if(sortColName.equals("totalClaimsCost"))
+				sortColName = "total";
+			
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "",conditionStr = "";
+		
+		if(!vm.getProvider().equals("all")) {
+			conditionStr = conditionStr + " and provider="+'\''+vm.getProvider()+'\'';
+		}
+		if(!vm.getPcpName().equals("all")) {
+			if(!vm.getProvider().equals("all"))
+				conditionStr = conditionStr + " and pcp_id="+'\''+vm.getPcpName()+'\'';
+			else 
+				conditionStr = conditionStr + " and pcp_name="+'\''+vm.getPcpName()+'\'';
+		}
+		System.out.println(vm.getYear());
+		if(!vm.getYear().equals("all")) {
+			conditionStr = conditionStr + " and eligible_month like "+'\''+vm.getYear()+"%"+'\'';
+		}
+		
+		if(!conditionStr.equals("")) {
+			conditionStr = " where "+conditionStr.substring(4);
+		}
+		
+			if(!filterStr.equals("") && conditionStr.equals(""))
+				filterStr = " where "+filterStr.substring(4);
+			
+			queryStr = "select C.*, (inst_claims + prof_claims) as total from (\r\n" + 
+					"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\r\n" + 
+					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
+					"select distinct max(dd.plan_name) planName,dd.last_name,dd.first_name,dd.medicare_id,min(dd.eligible_month) as eligibleMonth,dd.birth_date, dd.gender ,min(dd.pcp_name) as pcpName\r\n" + 
+					"from demographic_detail dd \r\n" + 
+					conditionStr+filterStr+" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id \r\n" + 
+					") A\r\n" + 
+					" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id\r\n" + 
+					"group by A.last_name,A.first_name,A.birth_date, A.eligibleMonth, A.pcpName, A.medicare_id order by A.last_name\r\n" + 
+					") B \r\n" + 
+					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
+					"group by B.last_name,B.first_name,B.birth_date, B.eligibleMonth, B.pcpName,B.medicare_id order by B.last_name\r\n" + 
+					") C\r\n" + 
+					" having total>50000" +havingStr;
+			
+			countQueryStr = "select count(*) from \n" + 
+					"(\n" + queryStr;
+		
+		System.out.println(queryStr+sortQryStr);
+		System.out.println(countQueryStr+sortCountQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		
+		String fileQuery = queryStr+sortCountQryStr;
+		
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
+	
+	
 	
 	public ReportResponseVM getPmpmByPracticeReportData(ReportVM vm) {
 		ReportResponseVM responseVM = new ReportResponseVM();

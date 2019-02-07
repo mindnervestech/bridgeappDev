@@ -50,6 +50,8 @@ import com.mnt.vm.reports.PmpmByPracticeExpandReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeExpandReportPrintDataVM;
 import com.mnt.vm.reports.PmpmByPracticeReportFileVM;
 import com.mnt.vm.reports.PmpmByPracticeReportPrintDataVM;
+import com.mnt.vm.reports.ReinsuranceCostReportFileVM;
+import com.mnt.vm.reports.ReinsuranceCostReportPrintDataVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportFileVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
@@ -180,6 +182,10 @@ public interface DashboardService {
 			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws IOException;
 	public void generateBeneficiariesManagementByClinicExpandReportPDF(
 			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public DashboardReportsVM getReinsuranceCostReportData(ReportVM vm);
+	public List<ReinsuranceCostReportPrintDataVM> getDataForReinsuranceCostReportPrint(ReinsuranceCostReportFileVM vm);
+	public void generateReinsuranceCostReportXLSX(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws IOException;
+	public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
 
 
 }
