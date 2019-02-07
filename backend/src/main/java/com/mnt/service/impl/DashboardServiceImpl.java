@@ -124,6 +124,7 @@ import com.mnt.vm.reports.SettledMonthsExpandReportVM;
 import com.mnt.vm.reports.SettledMonthsReportFileVM;
 import com.mnt.vm.reports.SettledMonthsReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsReportVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportFileVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportVM;
@@ -305,7 +306,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 	
 	public List<OptionsVM> getLocationsByYear(String year) {
-		List<String> locationData = rxDetailDao.getAllPCPLocationCode(year);
+		List<String> locationData = rxDetailDao.getAllPCPLocationByYear(year);
 		List<OptionsVM> pcpVMList = new ArrayList<>();
 		
 			for(String location : locationData) {
@@ -833,6 +834,12 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPmpm("$"+formatter.format(Double.parseDouble(obj[3].toString())));
 			if(obj[4] != null)
 				dataVM.setPmpy("$"+formatter.format(Double.parseDouble(obj[4].toString())));
+			if(obj[5] != null)
+				dataVM.setTotalPremium("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+			if(obj[6] != null)
+				dataVM.setIpaPremium("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			if(obj[7] != null)
+				dataVM.setDifference("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			
 			list.add(dataVM);
 		}
@@ -1060,16 +1067,18 @@ public class DashboardServiceImpl implements DashboardService {
 			if(obj[4] != null)
 				dataVM.setPcpLocation(obj[4].toString());
 			if(obj[5] != null)
+				dataVM.setDrgCode(obj[5].toString());
+			else
 				dataVM.setDrgCode("");
 			if(obj[6] != null)
+				dataVM.setBetosCat(obj[6].toString());
+			else
 				dataVM.setBetosCat("");
 			if(obj[7] != null)
 				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			if(obj[8] != null)
 				dataVM.setIcdCodes(obj[8].toString());
 			dataVM.setHccCodes("");
-			dataVM.setDrgCode("");
-			dataVM.setBetosCat("");
 			
 			list.add(dataVM);
 		}
@@ -1471,6 +1480,43 @@ public class DashboardServiceImpl implements DashboardService {
 			list.add(dataVM);
 		}
 		gridVM.setSpecialistComparisonExpandReportData(list);
+		gridVM.setPages(noOfPages);
+		gridVM.setTotalCount(responseVM.getTotalCount());
+		gridVM.setFileQuery(responseVM.getFileQuery());
+		return gridVM;
+	}
+	
+	public DashboardReportsVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = null;
+		Integer noOfPages = 0;
+		List<SpecialistComparisonExpandPracticeReportVM> list = new ArrayList<>();
+		DashboardReportsVM gridVM = new DashboardReportsVM();
+		ReportResponseVM responseVM = instClaimDetailDao.getSpecialistComparisonExpandPracticeReportData(vm);
+		resultData = responseVM.getDataList();
+		noOfPages = responseVM.getNoOfPages();
+		
+		for(Object[] obj: resultData) {
+			SpecialistComparisonExpandPracticeReportVM dataVM = new SpecialistComparisonExpandPracticeReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setPracticeName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setSpecialityType(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setPatientName(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setPcpName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setNumberOfClaims(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+			if(obj[6] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			
+			list.add(dataVM);
+		}
+		gridVM.setSpecialistComparisonExpandPracticeReportData(list);
 		gridVM.setPages(noOfPages);
 		gridVM.setTotalCount(responseVM.getTotalCount());
 		gridVM.setFileQuery(responseVM.getFileQuery());
@@ -1880,6 +1926,12 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPmpm("$"+formatter.format(Double.parseDouble(obj[3].toString())));
 			if(obj[4] != null)
 				dataVM.setPmpy("$"+formatter.format(Double.parseDouble(obj[4].toString())));
+			if(obj[5] != null)
+				dataVM.setTotalPremium("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+			if(obj[6] != null)
+				dataVM.setIpaPremium("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			if(obj[7] != null)
+				dataVM.setDifference("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			
 			list.add(dataVM);
 		}
@@ -4332,7 +4384,7 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 	}
 
 	
-public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+	public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
 		
 		List<PmpmByPracticeReportPrintDataVM> list = getDataForPmpmByPracticeReportPrint(fileVM);
 		
@@ -4353,6 +4405,12 @@ public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, O
 	        if(fileVM.showPMPM_pmpmByPractice)
 	        	tableColumnSize++;
 	        if(fileVM.showPMPY_pmpmByPractice)
+	        	tableColumnSize++;
+	        if(fileVM.showTotalPremium_pmpmByPractice)
+	        	tableColumnSize++;
+	        if(fileVM.showIpaPremium_pmpmByPractice)
+	        	tableColumnSize++;
+	        if(fileVM.showDifference_pmpmByPractice)
 	        	tableColumnSize++;
 	        
 	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
@@ -4408,6 +4466,33 @@ public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, O
 	        }
 	        if(fileVM.showPMPY_pmpmByPractice) {
 	        	PdfPCell cell7 = new PdfPCell(new Paragraph("PMPY", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        if(fileVM.showTotalPremium_pmpmByPractice) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Premium", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        if(fileVM.showIpaPremium_pmpmByPractice) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("IPA Premium", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        if(fileVM.showDifference_pmpmByPractice) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Premium - IPA Premium", font));
 	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
 		        cell7.setBackgroundColor(myColor);
@@ -4475,6 +4560,36 @@ public void generatePmpmByPracticeReportPDF(PmpmByPracticeReportFileVM fileVM, O
 		        }
 		        if(fileVM.showPMPY_pmpmByPractice) {
 		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getPmpy(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showTotalPremium_pmpmByPractice) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getTotalPremium(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showIpaPremium_pmpmByPractice) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getIpaPremium(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showDifference_pmpmByPractice) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getDifference(), rowFont));
 			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
 			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
 			        if(count%2 > 0)
@@ -9089,6 +9204,24 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	    	  cell1.setCellStyle(headerCellStyle);
 	      }
 	      
+	      if(fileVM.showTotalPremium_pmpmByPractice) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Total Premium");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showIpaPremium_pmpmByPractice) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("IPA Premium");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showDifference_pmpmByPractice) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Total Premium - IPA Premium");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
 	   // Create Other rows and cells
 	      int rowNum = 1;
 	      int rowIndex = 0;
@@ -9119,6 +9252,18 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 		      
 		      if(fileVM.showPMPY_pmpmByPractice) {
 		    	  row.createCell(++rowIndex).setCellValue(vm.getPmpy());
+		      }
+		      
+		      if(fileVM.showTotalPremium_pmpmByPractice) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getTotalPremium());
+		      }
+		      
+		      if(fileVM.showIpaPremium_pmpmByPractice) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getIpaPremium());
+		      }
+		      
+		      if(fileVM.showDifference_pmpmByPractice) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getDifference());
 		      }
 		      
 		      rowNum = rowNum + 1;
@@ -11109,6 +11254,38 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      InputStream is = new FileInputStream(new File("Data export-Specialist Comparison Expand Report Search.xlsx"));
 	      IOUtils.copy(is, os);
 	      fileOut.close();
+	}
+
+	@Override
+	public List<ReinsuranceManagementReportPrintDataVM> getDataForReinsuranceManagementReportPrint(ReinsuranceManagementReportFileVM fileVM) {
+		DecimalFormat formatter = new DecimalFormat("#,###");
+		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
+		List<ReinsuranceManagementReportPrintDataVM> list = new ArrayList<>();
+		
+		for(Object[] obj: resultData) {
+			ReinsuranceManagementReportPrintDataVM dataVM = new ReinsuranceManagementReportPrintDataVM();
+			
+			if(obj[0] != null)
+				dataVM.setPlanName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setPatientName(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setTermedMonth(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setPcpName(obj[3].toString());			
+			if(obj[4] != null)
+				dataVM.setHicn(obj[4].toString());
+			if(obj[5] != null)
+				dataVM.setInstClaims("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+			if(obj[6] != null)
+				dataVM.setProfClaims("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			if(obj[7] != null)
+				dataVM.setTotalCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			
+			list.add(dataVM);
+		}
+		
+		return list;
 	}
 	
 	

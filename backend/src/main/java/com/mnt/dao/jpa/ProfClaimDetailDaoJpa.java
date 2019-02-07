@@ -171,8 +171,8 @@ public class ProfClaimDetailDaoJpa extends BaseDaoJpa<ProfClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " order by pcp_name limit "+start+","+end;
-		String sortCountQryStr = " order by pcp_name";
+		String sortQryStr = " order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -205,26 +205,26 @@ public class ProfClaimDetailDaoJpa extends BaseDaoJpa<ProfClaimDetail> implement
 		if(!filterStr.equals(""))
 			filterStr = " where "+filterStr.substring(4);
 		
-			queryStr = "select * from (select concat(last_name,',',first_name) as patientName,pcp_name,pcp_location_code,pcp_cap as cost,'PCP CAP' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
+			queryStr = "select * from (select concat(last_name,',',first_name) as patientName,pcp_name,pcp_location_code,COALESCE(pcp_cap,0) as cost,'PCP CAP' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
 					"where eligible_month="+'\''+vm.getSelectedMonth()+'\''+conditionStr+" \n" + 
 					"union\n" + 
-					"select concat(last_name,',',first_name) as patientName,pcp_name,pcp_location_code,reinsurance_premium as cost,'REINSURANCE PREM' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
+					"select concat(last_name,',',first_name) as patientName,pcp_name,pcp_location_code,COALESCE(reinsurance_premium,0) as cost,'REINSURANCE PREM' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
 					"where eligible_month="+'\''+vm.getSelectedMonth()+'\''+conditionStr+" \n" +
 					"union \n" + 
 					"select concat(last_name,',',first_name) as patientName,pcp_name,pcp_location_code,\n" + 
-					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
-					"+dermatology as cost,'SPEC CLAIMS' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
+					"COALESCE(behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
+					"+dermatology,0) as cost,'SPEC CLAIMS' as claim_type,round(risk_score_partc,2) as mra,'' from demographic_detail \n" + 
 					"where eligible_month="+'\''+vm.getSelectedMonth()+'\''+conditionStr+" \n" + 
 					"union\n" + 
-					"select icd.member_name as patientName,icd.pcp_name,icd.pcp_location_code,icd.paid_amount as cost,'INST CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,icd.medicare_id from inst_claim_detail icd \n" + 
+					"select icd.member_name as patientName,icd.pcp_name,icd.pcp_location_code,COALESCE(icd.paid_amount,0) as cost,'INST CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,icd.medicare_id from inst_claim_detail icd \n" + 
 					"left join demographic_detail dd on dd.medicare_id = icd.medicare_id\n" + 
 					"where icd.first_service_date="+'\''+vm.getSelectedMonth()+'\''+icdCondStr+" \n" + 
 					"union\n" + 
-					" select pcd.member_name as patientName,pcd.pcp_name,pcd.pcp_location_code,pcd.paid_amount as cost,'PROF CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,pcd.medicare_id from prof_claim_detail pcd \n" + 
+					" select pcd.member_name as patientName,pcd.pcp_name,pcd.pcp_location_code,COALESCE(pcd.paid_amount,0) as cost,'PROF CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,pcd.medicare_id from prof_claim_detail pcd \n" + 
 					" left join demographic_detail dd on dd.medicare_id = pcd.medicare_id\n" + 
 					" where pcd.first_service_date="+'\''+vm.getSelectedMonth()+'\''+pcdCondStr+" \n" + 
 					"union\n" + 
-					"select concat(rd.last_name,',',rd.first_name) as patientName,rd.pcp_name,rd.pcp_location_code,rd.paid_amount as cost,'RX CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,rd.medicare_id from rx_detail rd \n" + 
+					"select concat(rd.last_name,',',rd.first_name) as patientName,rd.pcp_name,rd.pcp_location_code,COALESCE(rd.paid_amount,0) as cost,'RX CLAIMS' as claim_type,round(dd.risk_score_partc,2) as mra,rd.medicare_id from rx_detail rd \n" + 
 					"left join demographic_detail dd on dd.medicare_id = rd.medicare_id\n" + 
 					"where rd.date_filled="+'\''+vm.getSelectedMonth()+'\''+rdCondStr+") A" +filterStr+havingStr;
 					

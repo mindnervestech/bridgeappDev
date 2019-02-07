@@ -12,4 +12,5 @@ public interface RxDetailDao extends BaseDao<RxDetail> {
 	public List<String> getAllPlans();
 	public List<Object[]> getAllPCP(String provider);
 	public List<String> getAllPCPLocationCode(String year);
+	public List<String> getAllPCPLocationByYear(String year);
 }

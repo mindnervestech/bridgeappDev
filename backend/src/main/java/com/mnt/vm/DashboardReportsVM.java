@@ -15,6 +15,7 @@ import com.mnt.vm.reports.ReinsuranceCostReportVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportVM;
 import com.mnt.vm.reports.SettledMonthsReportVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportVM;
 
 public class DashboardReportsVM {
@@ -24,6 +25,7 @@ public class DashboardReportsVM {
 	public List<AdmissionsReportExpandVM> admissionsReportExpandData;
 	public List<SpecialistComparisonReportVM> specialistComparisonReportData;
 	public List<SpecialistComparisonExpandReportVM> specialistComparisonExpandReportData;
+	public List<SpecialistComparisonExpandPracticeReportVM> specialistComparisonExpandPracticeReportData;
 	public List<PatientVisitReportVM> patientVisitReportData;
 	public List<SummaryReportVM> summaryReportData;
 	public List<SettledMonthsReportVM> settledMonthsData;
@@ -218,5 +220,12 @@ public class DashboardReportsVM {
 	public void setBeneficiariesManagementByDoctorExpandData(
 			List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByDoctorExpandData) {
 		this.beneficiariesManagementByDoctorExpandData = beneficiariesManagementByDoctorExpandData;
+	}
+	public List<SpecialistComparisonExpandPracticeReportVM> getSpecialistComparisonExpandPracticeReportData() {
+		return specialistComparisonExpandPracticeReportData;
+	}
+	public void setSpecialistComparisonExpandPracticeReportData(
+			List<SpecialistComparisonExpandPracticeReportVM> specialistComparisonExpandPracticeReportData) {
+		this.specialistComparisonExpandPracticeReportData = specialistComparisonExpandPracticeReportData;
 	}
 }

@@ -312,6 +312,12 @@ public class DashboardController {
 		return dashboardService.getSpecialistComparisonExpandReportData(vm);
     }
 	
+	@RequestMapping(value="/getSpecialistComparisonExpandPracticeReportData",method = RequestMethod.POST)
+	@ResponseBody
+    public DashboardReportsVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm) {
+		return dashboardService.getSpecialistComparisonExpandPracticeReportData(vm);
+    }
+	
 	@RequestMapping(value="/getDataForPrint",method = RequestMethod.POST)
 	@ResponseBody
     public List<PrintDataVM> getDataForPrint(FileVM vm) {

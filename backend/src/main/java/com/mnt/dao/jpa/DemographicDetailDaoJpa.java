@@ -293,8 +293,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -584,8 +584,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -618,7 +618,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\n" + 
 					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\n" + 
 					"select distinct max(dd.plan_name) planName,dd.mbi,dd.last_name,dd.first_name,dd.birth_date,min(dd.eligible_month) as eligibleMonth,min(dd.pcp_name) as pcpName,min(dd.pcp_location_code) as pcpLocation,\n" + 
-					"max(round(dd.risk_score_partc,2)) as mra,max(concat(dd.member_addr1,' ',dd.city,' ',dd.state,' ',dd.zip)) as address,dd.medicare_id,\n" + 
+					"COALESCE(max(round(dd.risk_score_partc,2)),0) as mra,max(concat(dd.member_addr1,' ',dd.city,' ',dd.state,' ',dd.zip)) as address,dd.medicare_id,\n" + 
 					"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\n" + 
 					"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\n" + 
 					"from demographic_detail dd \n" +conditionStr+" "+filterStr+" group by dd.mbi,dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id \n" + 
@@ -727,8 +727,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -886,8 +886,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = "  order by totalCost desc limit "+start+","+end;
+		String sortCountQryStr = " order by totalCost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1023,8 +1023,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1049,13 +1049,14 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 			conditionStr = " where "+conditionStr.substring(4);
 		}
 		
+			if(!vm.getProvider().equals("all")) {	
 				
 			queryStr = "select D.*, (spec_cost + pcp_cap + reinsurance_prem + inst_claims + prof_claims + rx_claims) as total from (\n" + 
 					"select C.*, COALESCE(round(sum(rd.paid_amount - lics_paid - rep_gap_dscnt),2),0) as rx_claims from  (\n" + 
 					"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\n" + 
 					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\n" + 
 					"select dd.pcp_name,min(dd.pcp_location_code) as pcpLocation,\n" + 
-					"round(avg(dd.risk_score_partc),2) as mra,dd.pcp_id,\n" + 
+					"COALESCE(round(avg(dd.risk_score_partc),2),0) as mra,dd.pcp_id,\n" + 
 					"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\n" + 
 					"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\n" + 
 					"from demographic_detail dd \n" +conditionStr+"  group by dd.pcp_name,dd.pcp_id \n" + 
@@ -1069,6 +1070,31 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"left join rx_detail rd on rd.pcp_id = C.pcp_id\n" + 
 					"group by C.pcp_name,C.pcp_id\n" + 
 					") D "+havingStr;
+			}
+			
+			if(vm.getProvider().equals("all")) {	
+				
+				queryStr = "select pcp_name,min(pcpLocation) as pcpLocation,COALESCE(round(avg(mra),2),0) as mra,pcp_name as pcpId,sum(spec_cost) as spec_cost,sum(pcp_cap) as pcp_cap,sum(reinsurance_prem) as reinsurance_prem,sum(inst_claims) as inst_claims,sum(prof_claims) as prof_claims,sum(rx_claims) as rx_claims,sum(total) as total from("+
+						"select D.*, (spec_cost + pcp_cap + reinsurance_prem + inst_claims + prof_claims + rx_claims) as total from (\n" + 
+						"select C.*, COALESCE(round(sum(rd.paid_amount - lics_paid - rep_gap_dscnt),2),0) as rx_claims from  (\n" + 
+						"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\n" + 
+						"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\n" + 
+						"select dd.pcp_name,min(dd.pcp_location_code) as pcpLocation,\n" + 
+						"round(avg(dd.risk_score_partc),2) as mra,dd.pcp_id,\n" + 
+						"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\n" + 
+						"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\n" + 
+						"from demographic_detail dd \n" +conditionStr+"  group by dd.pcp_name,dd.pcp_id \n" + 
+						") A\n" + 
+						" left join inst_claim_detail icd on icd.pcp_id = A.pcp_id\n" + 
+						"group by A.pcp_name,A.pcp_id\n" + 
+						") B \n" + 
+						"left join prof_claim_detail pcd on pcd.pcp_id = B.pcp_id\n" + 
+						"group by B.pcp_name,B.pcp_id\n" + 
+						") C\n" + 
+						"left join rx_detail rd on rd.pcp_id = C.pcp_id\n" + 
+						"group by C.pcp_name,C.pcp_id\n" + 
+						") D ) E group by pcp_name "+havingStr;
+			}
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + 
@@ -1196,8 +1222,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1345,7 +1371,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "drg_code";
 			}
 			if(filteredList.get(i).getId().equals("betosCat")) {
-				filterColumnName = "";
+				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
 				filterColumnName = "cost";
@@ -1387,7 +1413,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "drg_code";
 			}
 			if(sortedList.get(0).getId().equals("betosCat")) {
-				sortColName = "	";
+				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
 				sortColName = "cost";
@@ -1408,8 +1434,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = "  order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1503,7 +1529,6 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
 		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
 		noOfPages = totalCount/vm.getPageSize();
-		System.out.println(noOfPages);
 		if(totalCount % vm.getPageSize() > 0)
 			noOfPages++;
 		
@@ -1559,7 +1584,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "drg_code";
 			}
 			if(filteredList.get(i).getId().equals("betosCat")) {
-				filterColumnName = "";
+				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
 				filterColumnName = "cost";
@@ -1601,7 +1626,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "drg_code";
 			}
 			if(sortedList.get(0).getId().equals("betosCat")) {
-				sortColName = "	";
+				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
 				sortColName = "cost";
@@ -1622,8 +1647,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = "  order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1677,7 +1702,6 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
 		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
 		noOfPages = totalCount/vm.getPageSize();
-		System.out.println(noOfPages);
 		if(totalCount % vm.getPageSize() > 0)
 			noOfPages++;
 		
@@ -1793,8 +1817,8 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -1807,38 +1831,38 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		
 		if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
 				
-			queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+			queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
-					"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+					"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
-					"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+					"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
-					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
-					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
-					"+dermatology as cost,'' as principal_diagnosis from demographic_detail where pcp_id="+'\''+vm.getPcpId()+'\''+") A "+filterStr;
+					"+dermatology as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+") A "+filterStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + 
 					queryStr;
 		} else {
 			if(vm.getProvider().equals("all")) {
-				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+				queryStr = "select * from (select claim_id,first_service_date as claim_date,'INST CLAIMS' as claim_type,clinic_facility_name,pcp_name,drg_code,betos_cat,paid_amount as cost,principal_diagnosis from inst_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select claim_id,first_service_date as claim_date,'PROF CLAIMS' as claim_type,clinic_facility_name,pcp_name,'' as drg_code,betos_cat,paid_amount as cost,principal_diagnosis from prof_claim_detail where first_service_date like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where date_filled like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select claim_id,date_filled as claim_date,'RX CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,paid_amount as cost,'' as principal_diagnosis from rx_detail where date_filled like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
-						"+dermatology as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+") A "+filterStr;
+						"+dermatology as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+") A "+filterStr;
 			}
 			if(vm.getYear().equals("all")) {
 				

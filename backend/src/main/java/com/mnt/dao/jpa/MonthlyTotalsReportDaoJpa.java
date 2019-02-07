@@ -511,11 +511,13 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				filterColumnName = "medicare_id";
 			}
 			if(filterColumnName.equals("planName")) {
-				filterColumnName = "plan_name";
-			}if(filterColumnName.equals("patientName")) {
-				filterColumnName = "member_name";
-			}if(filterColumnName.equals("pcpName")) {
-				filterColumnName = "pcp_name";
+				filterColumnName = "planName";
+			}
+			if(filterColumnName.equals("patientName")) {
+				filterColumnName = "memberName";
+			}
+			if(filterColumnName.equals("pcpName")) {
+				filterColumnName = "pcpName";
 			}
 			if(filterColumnName.equals("instClaims")) {
 				filterColumnName = "inst_claims";
@@ -525,22 +527,15 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			}
 			
 			if(filterColumnName.equals("termedMonth")) {
-				filterColumnName = "service_month";
+				filterColumnName = "eligibleMonth";
 			}
 			if(filterColumnName.equals("totalCost")) {
 				filterColumnName = "total";
 			}
 			
-				if(!filterColumnName.equals("") && !filterColumnName.equals("pcp_name")) {
-					if(!havingStr.equals("")) {
-						havingStr += "and ";
-					} else {
-						havingStr = " having ";
-					}
-					havingStr += filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
-				} else {
-					if(!filterColumnName.equals(""))
-					filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+				if(!filterColumnName.equals("")) {
+					
+					havingStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
 				}
 		}
 		
@@ -552,13 +547,13 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			if(sortColName.equals("hicn"))
 				sortColName = "medicare_id";
 			if(sortColName.equals("planName"))
-				sortColName = "plan_name";
+				sortColName = "planName";
 			if(sortColName.equals("patientName"))
-				sortColName = "member_name";
+				sortColName = "memberName";
 			if(sortColName.equals("pcpName"))
-				sortColName = "pcp_name";
+				sortColName = "pcpName";
 			if(sortColName.equals("termedMonth"))
-				sortColName = "service_month";
+				sortColName = "eligibleMonth";
 			if(sortColName.equals("instClaims"))
 					sortColName="inst_claims";
 			if(sortColName.equals("profClaims"))
@@ -619,14 +614,14 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 					"select distinct max(dd.plan_name) planName,concat(dd.last_name,' ',dd.first_name) as memberName,min(dd.eligible_month) as eligibleMonth,min(dd.pcp_name) as pcpName,\r\n" + 
 					"dd.medicare_id \r\n" + 
 					"from demographic_detail dd \r\n" + 
-					conditionStr+" "+filterStr+" group by dd.medicare_id,memberName\r\n" + 
+					conditionStr+" group by dd.medicare_id,memberName\r\n" + 
 					") A\r\n" + 
 					" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id \r\n" + 
 					"group by A.eligibleMonth, A.pcpName, A.medicare_id, A.memberName 	\r\n" + 
 					") B \r\n" + 
 					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
-					"group by B.eligibleMonth, B.pcpName, B.medicare_id,B.memberName \r\n" +havingStr+ 
-					") C having total>10000 ";
+					"group by B.eligibleMonth, B.pcpName, B.medicare_id,B.memberName \r\n" + 
+					") C having total > 10000 "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
@@ -880,8 +875,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " order by pcp_name limit "+start+","+end;
-		String sortCountQryStr = " order by pcp_name";
+		String sortQryStr = " order by totalCost desc limit "+start+","+end;
+		String sortCountQryStr = " order by totalCost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -908,10 +903,10 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		
 			if(!filterStr.equals("") && conditionStr.equals(""))
 				filterStr = " where "+filterStr.substring(4);
-			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy from (\n"+
+			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy,round(sum(total_premium),2) as totalPremium,round(sum(ipa_premium),2) as ipaPremium,round(sum(total_premium-ipa_premium),2) as diff from (\n"+
 					"select pcp_name,round(sum(total_expenses)+constant_val*sum(membership),0) as totalCost,sum(membership) as totalNumberOfMemberMonth,\n" + 
 					"round((sum(total_expenses)+constant_val*sum(membership))/sum(membership),0) as pmpm,\n" + 
-					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id from monthly_totals_data \n" + 
+					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id,sum(ipa_premium) as ipa_premium,sum(total_premium) as total_premium from monthly_totals_data \n" + 
 					conditionStr+" "+filterStr+" group by pcp_name,constant_val,pcp_id) A group by pcp_name "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 

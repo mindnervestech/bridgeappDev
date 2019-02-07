@@ -2534,7 +2534,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		end = vm.getPageSize();
 		
 		String sortQryStr = " order by paid_amount desc limit "+start+","+end;
-		String sortCountQryStr = " order by paid_amount ";
+		String sortCountQryStr = " order by paid_amount desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -2986,8 +2986,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by totalCost desc limit "+start+","+end;
+		String sortCountQryStr = " order by totalCost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -3143,8 +3143,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by paid_amount desc limit "+start+","+end;
+		String sortCountQryStr = " order by paid_amount desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -3320,8 +3320,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by paid_amount desc limit "+start+","+end;
+		String sortCountQryStr = " order by paid_amount desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -3436,8 +3436,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		start = end - vm.getPageSize();
 		end = vm.getPageSize();
 		
-		String sortQryStr = " limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortQryStr = " order by total desc limit "+start+","+end;
+		String sortCountQryStr = " order by total desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -3574,7 +3574,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		end = vm.getPageSize();
 		
 		String sortQryStr = " order by cost desc limit "+start+","+end;
-		String sortCountQryStr = "";
+		String sortCountQryStr = " order by cost desc ";
 		if(!sortStr.equals("")) {
 			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
 			sortCountQryStr = " order by "+sortStr;
@@ -3626,5 +3626,148 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		return responseVM;
 	}
 	
+	public ReportResponseVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "",havingStr = "";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			if(filteredList.get(i).getId().equals("practiceName")) {
+				filterColumnName = "provider_name";
+			}
+			if(filteredList.get(i).getId().equals("specialityType")) {
+				filterColumnName = "claim_specialty";
+			}
+			if(filteredList.get(i).getId().equals("patientName")) {
+				filterColumnName = "member_name";
+			}
+			if(filteredList.get(i).getId().equals("pcpName")) {
+				filterColumnName = "pcp_name";
+			}
+			if(filteredList.get(i).getId().equals("numberOfClaims")) {
+				filterColumnName = "noOfClaims";
+			}
+			if(filteredList.get(i).getId().equals("averageCostPerClaim")) {
+				filterColumnName = "avgCost";
+			}
+			if(filteredList.get(i).getId().equals("cost")) {
+				filterColumnName = "cost";
+			}
+			
+			if(filterColumnName.equals("provider_name") || filterColumnName.equals("claim_specialty") || filterColumnName.equals("member_name") || filterColumnName.equals("pcp_name")) {
+				filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+				
+			if(filterColumnName.equals("noOfClaims") || filterColumnName.equals("avgCost") || filterColumnName.equals("cost")) {
+				if(!havingStr.equals("")) {
+					havingStr += "and ";
+				} else {
+					havingStr = " having ";
+				}
+				havingStr += filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+			
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			if(sortedList.get(0).getId().equals("practiceName")) {
+				sortColName = "provider_name";
+			}
+			if(sortedList.get(0).getId().equals("specialityType")) {
+				sortColName = "claim_specialty";
+			}
+			if(sortedList.get(0).getId().equals("patientName")) {
+				sortColName = "member_name";
+			}
+			if(sortedList.get(0).getId().equals("pcpName")) {
+				sortColName = "pcp_name";
+			}
+			if(sortedList.get(0).getId().equals("numberOfClaims")) {
+				sortColName = "noOfClaims";
+			}
+			if(sortedList.get(0).getId().equals("averageCostPerClaim")) {
+				sortColName = "avgCost";
+			}
+			if(sortedList.get(0).getId().equals("cost")) {
+				sortColName = "cost";
+			}
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " order by cost desc limit "+start+","+end;
+		String sortCountQryStr = " order by cost desc ";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "",conditionStr = "";
+		
+		if(!vm.getProvider().equals("all")) {
+			conditionStr = conditionStr + " and provider="+'\''+vm.getProvider()+'\'';
+		}
+		if(!vm.getPcpName().equals("all")) {
+			if(!vm.getProvider().equals("all"))
+				conditionStr = conditionStr + " and pcp_id="+'\''+vm.getPcpName()+'\'';
+			else 
+				conditionStr = conditionStr + " and pcp_name="+'\''+vm.getPcpName()+'\'';
+		}
+		if(!vm.getYear().equals("all")) {
+			conditionStr = conditionStr + " and first_service_date like "+'\''+vm.getYear()+"%"+'\'';
+		}
+		
+		
+		queryStr = "select provider_name,claim_specialty,member_name,pcp_name,count(distinct claim_id) as noOfClaims,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost from prof_claim_detail \n" + 
+					"where provider_name="+'\''+vm.getPracticeName()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,pcp_name "+havingStr
+					;
+		
+		countQueryStr = "select count(*) from \n" + 
+				"(\n" + 
+				queryStr;
+		
+		System.out.println(queryStr+sortQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		System.out.println(countQueryStr+sortCountQryStr);
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		
+		String fileQuery = queryStr+sortCountQryStr;
+		
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
 	
 }

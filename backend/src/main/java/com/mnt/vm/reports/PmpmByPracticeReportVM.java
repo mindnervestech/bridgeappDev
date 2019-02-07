@@ -9,6 +9,9 @@ public class PmpmByPracticeReportVM {
 	public String totalNumberOfMemberMonth;
 	public String pmpm;
 	public String pmpy;
+	public String totalPremium;
+	public String ipaPremium;
+	public String difference;
 	
 	public String getFacilityLocationName() {
 		return facilityLocationName;
@@ -51,5 +54,23 @@ public class PmpmByPracticeReportVM {
 	}
 	public void setPcpId(String pcpId) {
 		this.pcpId = pcpId;
+	}
+	public String getTotalPremium() {
+		return totalPremium;
+	}
+	public void setTotalPremium(String totalPremium) {
+		this.totalPremium = totalPremium;
+	}
+	public String getIpaPremium() {
+		return ipaPremium;
+	}
+	public void setIpaPremium(String ipaPremium) {
+		this.ipaPremium = ipaPremium;
+	}
+	public String getDifference() {
+		return difference;
+	}
+	public void setDifference(String difference) {
+		this.difference = difference;
 	}
 }

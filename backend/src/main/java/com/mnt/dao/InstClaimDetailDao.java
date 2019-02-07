@@ -21,6 +21,7 @@ public interface InstClaimDetailDao extends BaseDao<InstClaimDetail> {
 	public ReportResponseVM getAdmissionsReportExpandData(ReportVM vm);
 	public ReportResponseVM getSpecialistComparisonReportData(ReportVM vm);
 	public ReportResponseVM getSpecialistComparisonExpandReportData(ReportVM vm);
+	public ReportResponseVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm);
 	public List<Object[]> getDataForFile(String fileQuery);
 	public List<Object[]> getDuplicateClaimsAllData(String fileQuery);
 }

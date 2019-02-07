@@ -41,6 +41,7 @@ public class ReportVM {
 	public String claimTypeValue;
 	public String PcpLocation;
 	public String clinicName;
+	public String practiceName;
 	
 	
 	public String getClinicName() {
@@ -264,5 +265,11 @@ public class ReportVM {
 	}
 	public void setClaimTypeValue(String claimTypeValue) {
 		this.claimTypeValue = claimTypeValue;
+	}
+	public String getPracticeName() {
+		return practiceName;
+	}
+	public void setPracticeName(String practiceName) {
+		this.practiceName = practiceName;
 	}
 }

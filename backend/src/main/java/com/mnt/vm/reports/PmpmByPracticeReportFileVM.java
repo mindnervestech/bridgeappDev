@@ -9,6 +9,9 @@ public class PmpmByPracticeReportFileVM {
 	public boolean showTotalNumberOfMemberMonth_pmpmByPractice;
 	public boolean showPMPM_pmpmByPractice;
 	public boolean showPMPY_pmpmByPractice;
+	public boolean showTotalPremium_pmpmByPractice;
+	public boolean showIpaPremium_pmpmByPractice;
+	public boolean showDifference_pmpmByPractice;
 	
 	public String getFileQuery() {
 		return fileQuery;
@@ -51,5 +54,23 @@ public class PmpmByPracticeReportFileVM {
 	}
 	public void setShowPMPY_pmpmByPractice(boolean showPMPY_pmpmByPractice) {
 		this.showPMPY_pmpmByPractice = showPMPY_pmpmByPractice;
+	}
+	public boolean isShowIpaPremium_pmpmByPractice() {
+		return showIpaPremium_pmpmByPractice;
+	}
+	public void setShowIpaPremium_pmpmByPractice(boolean showIpaPremium_pmpmByPractice) {
+		this.showIpaPremium_pmpmByPractice = showIpaPremium_pmpmByPractice;
+	}
+	public boolean isShowDifference_pmpmByPractice() {
+		return showDifference_pmpmByPractice;
+	}
+	public void setShowDifference_pmpmByPractice(boolean showDifference_pmpmByPractice) {
+		this.showDifference_pmpmByPractice = showDifference_pmpmByPractice;
+	}
+	public boolean isShowTotalPremium_pmpmByPractice() {
+		return showTotalPremium_pmpmByPractice;
+	}
+	public void setShowTotalPremium_pmpmByPractice(boolean showTotalPremium_pmpmByPractice) {
+		this.showTotalPremium_pmpmByPractice = showTotalPremium_pmpmByPractice;
 	}
 }

@@ -81,6 +81,21 @@ public class RxDetailDaoJpa extends BaseDaoJpa<RxDetail> implements RxDetailDao 
 	@Transactional
 	public List<String> getAllPCPLocationCode(String year) {
 		String str  = "";
+		
+		if(year.equals("all")) {
+			str = "select distinct pcp_location from monthly_totals_data order by pcp_location";
+		} else {
+			str = "select distinct pcp_location from monthly_totals_data where year=(select distinct year from monthly_totals_data order by year desc limit 1) order by pcp_location";
+		}
+		Query query = getEntityManager().createNativeQuery(str);
+		return query.getResultList();
+	}
+	
+	@Override
+	@Transactional
+	public List<String> getAllPCPLocationByYear(String year) {
+		String str  = "";
+		
 		if(year.equals("all")) {
 			str = "select distinct pcp_location from monthly_totals_data order by pcp_location";
 		} else {
@@ -89,4 +104,5 @@ public class RxDetailDaoJpa extends BaseDaoJpa<RxDetail> implements RxDetailDao 
 		Query query = getEntityManager().createNativeQuery(str);
 		return query.getResultList();
 	}
+	
 }

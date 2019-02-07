@@ -90,6 +90,7 @@ public interface DashboardService {
 	DashboardReportsVM getAdmissionsReportExpandData(ReportVM vm);
 	DashboardReportsVM getSpecialistComparisonReportData(ReportVM vm);
 	DashboardReportsVM getSpecialistComparisonExpandReportData(ReportVM vm);
+	DashboardReportsVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm);
 	
 	MembershipManagementVM getMembershipManagementData(ReportVM vm);
 	List<PrintDataVM> getDataForPrint(FileVM fileVM);

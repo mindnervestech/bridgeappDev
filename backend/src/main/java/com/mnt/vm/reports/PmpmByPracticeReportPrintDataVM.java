@@ -21,6 +21,15 @@ public class PmpmByPracticeReportPrintDataVM {
 	
 	@JsonProperty("PMPY")
 	public String pmpy;
+	
+	@JsonProperty("Total Premium")
+	public String totalPremium;
+	
+	@JsonProperty("IPA Premium")
+	public String ipaPremium;
+	
+	@JsonProperty("Total Premium - IPA Premium")
+	public String difference;
 
 	public String getFacilityLocationName() {
 		return facilityLocationName;
@@ -68,5 +77,29 @@ public class PmpmByPracticeReportPrintDataVM {
 
 	public void setPmpy(String pmpy) {
 		this.pmpy = pmpy;
+	}
+
+	public String getTotalPremium() {
+		return totalPremium;
+	}
+
+	public void setTotalPremium(String totalPremium) {
+		this.totalPremium = totalPremium;
+	}
+
+	public String getIpaPremium() {
+		return ipaPremium;
+	}
+
+	public void setIpaPremium(String ipaPremium) {
+		this.ipaPremium = ipaPremium;
+	}
+
+	public String getDifference() {
+		return difference;
+	}
+
+	public void setDifference(String difference) {
+		this.difference = difference;
 	}
 }
