@@ -962,13 +962,13 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				filterColumnName = "mra";
 			}
 			if(filterColumnName.equals("cost")) {
-				filterColumnName = "";
+				filterColumnName = "total";
 			}
 			if(filterColumnName.equals("claimType")) {
-				filterColumnName = "";
+				filterColumnName = "claimType";
 			}
 			
-				if(!filterColumnName.equals("") && filterColumnName.equals("mra")) {
+				if(filterColumnName.equals("claimType") || filterColumnName.equals("total") || filterColumnName.equals("mra")) {
 					if(!havingStr.equals("")) {
 						havingStr += "and ";
 					} else {
@@ -987,17 +987,17 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			
 			sortColName = sortedList.get(0).getId();
 			if(sortColName.equals("patientName"))
-				sortColName = "last_name,first_name";
+				sortColName = "concat(last_name,first_name)";
 			if(sortColName.equals("pcpName"))
-				sortColName = "pcp_name";
+				sortColName = "pcpName";
 			if(sortColName.equals("pcpLocation"))
-				sortColName = "pcp_location_code";
+				sortColName = "pcpLocation";
 			if(sortColName.equals("mra"))
 				sortColName = "mra";
 			if(sortColName.equals("cost"))
-				sortColName = "";
+				sortColName = "total";
 			if(sortColName.equals("claimType"))
-				sortColName = "";
+				sortColName = "claimType";
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
 				if(sortedList.get(0).isDesc()) {
@@ -1021,45 +1021,45 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			sortCountQryStr = " order by "+sortStr;
 		}
 		
-		String queryStr = "",countQueryStr = "";
+		String queryStr = "",countQueryStr = "", conditionStr ="";
 		
-		
-		if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
-			queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-					+ " where pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
-			
-			countQueryStr = "select count(*) from \n" + 
-					"(\n" + queryStr;
-		} else {
-			if(vm.getProvider().equals("all")) {
-				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-						+ " where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
-				
-				countQueryStr = "select count(*) from \n" + 
-						"(\n" + 
-						queryStr;
-			}
-			if(vm.getYear().equals("all")) {
-				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-						+ " where provider="+'\''+vm.getProvider()+'\''+
-						" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
-				
-				countQueryStr = "select count(*) from \n" + 
-						"(\n" + 
-						queryStr;
-			}
-			if(!vm.getProvider().equals("all") && !vm.getYear().equals("all")) {
-				
-				queryStr = "select distinct last_name,first_name,pcp_name,pcp_location_code,round(max(risk_score_partc),2) as mra,max(eligible_month) from demographic_detail"
-						+ " where provider="+'\''+vm.getProvider()+'\''+" and \n" + 
-						"eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+filterStr+" group by pcp_name,first_name,last_name,pcp_location_code "+havingStr;
-				
-				countQueryStr = "select count(*) from \n" + 
-						"(\n" + 
-						queryStr;
-				
-			}
+		if(!vm.getProvider().equals("all")) {
+			conditionStr+=" and dd.provider = '" +vm.getProvider()+"' ";
 		}
+		
+		if(!vm.getYear().equals("all")) {
+			conditionStr+=" and dd.eligible_month like '"+vm.getYear() +"%' ";
+		}
+		
+
+		
+		queryStr = "select D.*, (spec_cost + pcp_cap + reinsurance_prem + inst_claims + prof_claims + rx_claims) as total,concat(if(inst_claims !=0,'INST_CLAIM',''),if(inst_claims!=0,', ',' '),if(prof_claims!=0,'PROF_CLAIMS',''),if(prof_claims!=0,', ',' '),if(rx_claims !=0,'RX_CLAIM',''),if(rx_claims!=0,', ',' '),if(reinsurance_prem!=0,'REINSURANCE_PREM',''),if(reinsurance_prem!=0,', ',' '),if(pcp_cap !=0,'PCP_CAP',''),if(pcp_cap!=0,', ',' '),if(spec_cost!=0,'SPEC_COST','')) as claimType from (\r\n" + 
+				"select C.*, COALESCE(round(sum(rd.paid_amount - lics_paid - rep_gap_dscnt),2),0) as rx_claims from  (\r\n" + 
+				"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\r\n" + 
+				"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
+				"select distinct dd.last_name,dd.first_name,min(dd.pcp_name) as pcpName,min(dd.pcp_location_code) as pcpLocation,\r\n" + 
+				"IFNULL(max(round(dd.risk_score_partc,2)),0) as mra,dd.medicare_id,\r\n" + 
+				"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\r\n" + 
+				"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\r\n" + 
+				"from demographic_detail dd where dd.pcp_name = '" +vm.getPcpName() +"' "+ conditionStr+filterStr+
+				" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id \r\n" + 
+				") A\r\n" + 
+				" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id\r\n" + 
+				"group by A.last_name,A.first_name,A.pcpName, A.pcpLocation, A.mra, A.medicare_id order by A.last_name\r\n" + 
+				") B \r\n" + 
+				"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
+				"group by B.last_name,B.first_name, B.pcpName, B.pcpLocation, B.mra, B.medicare_id order by B.last_name\r\n" + 
+				") C \r\n" + 
+				"left join rx_detail rd  on rd.medicare_id = C.medicare_id \r\n" + 
+				"group by C.last_name,C.first_name, C.pcpName, C.pcpLocation, C.mra, C.medicare_id order by C.last_name\r\n" + 
+				")  D \r\n" + 
+				"\r\n" +havingStr ;
+				
+				countQueryStr = "select count(*) from \n" + 
+						"(\n" + 
+						queryStr;
+				
+			
 		
 		System.out.println(queryStr+sortQryStr);
 		System.out.println(countQueryStr+sortCountQryStr);

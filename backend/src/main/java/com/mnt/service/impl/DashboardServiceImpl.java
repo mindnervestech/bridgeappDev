@@ -1209,7 +1209,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 	
 	public DashboardReportsVM getPmpmByPracticeExpandReportData(ReportVM vm) {
-		DecimalFormat formatter = new DecimalFormat("#,###");
+		DecimalFormat formatter = new DecimalFormat("#,###.##");
 		List<Object[]> resultData = null;
 		Integer noOfPages = 0;
 		List<PmpmByPracticeExpandReportVM> list = new ArrayList<>();
@@ -1229,8 +1229,10 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPcpLocation(obj[3].toString());
 			if(obj[4] != null)
 				dataVM.setMra(obj[4].toString());
-			dataVM.setCost("");
-			dataVM.setClaimType("");
+			if(obj[12]!=null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[12].toString())));
+			if(obj[13]!=null)
+				dataVM.setClaimType(obj[13].toString());
 			
 			list.add(dataVM);
 		}
@@ -2208,7 +2210,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 	
 	public List<PmpmByPracticeExpandReportPrintDataVM> getDataForPmpmByPracticeExpandReportPrint(PmpmByPracticeExpandReportFileVM fileVM) {
-		DecimalFormat formatter = new DecimalFormat("#,###");
+		DecimalFormat formatter = new DecimalFormat("#,###.##");
 		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
 		List<PmpmByPracticeExpandReportPrintDataVM> list = new ArrayList<>();
 		
@@ -2223,8 +2225,10 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPcpLocation(obj[3].toString());
 			if(obj[4] != null)
 				dataVM.setMra(obj[4].toString());
-			dataVM.setCost("");
-			dataVM.setClaimType("");
+			if(obj[12] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[12].toString())));
+			if(obj[13] != null)
+				dataVM.setClaimType(obj[13].toString());
 			
 			list.add(dataVM);
 		}
