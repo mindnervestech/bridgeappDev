@@ -222,15 +222,13 @@ public class DashboardController {
 	
 	@RequestMapping(value="/getReinsuranceManagementData", method =RequestMethod.POST)
 	@ResponseBody
-	public DashboardReportsVM getReinsuranceManagementData(ReportVM vm)
-	{
+	public DashboardReportsVM getReinsuranceManagementData(ReportVM vm) {
 		return dashboardService.getReinsuranceManagementData(vm);
 	}
 	
 	@RequestMapping(value="/getReinsuranceCostReportData", method =RequestMethod.POST)
 	@ResponseBody
-	public DashboardReportsVM getReinsuranceCostReportData(ReportVM vm)
-	{
+	public DashboardReportsVM getReinsuranceCostReportData(ReportVM vm) {
 		return dashboardService.getReinsuranceCostReportData(vm);
 	}
 	

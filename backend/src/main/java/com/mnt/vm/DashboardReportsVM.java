@@ -32,28 +32,22 @@ public class DashboardReportsVM {
 	public List<SettledMonthsExpandReportVM> settledMonthsExpandData;
 	public List<PmpmByPracticeReportVM> pmpmByPracticeData;
 	public List<ReinsuranceManagementReportVM> reinsuranceManagementData;
-	
-	public List<ReinsuranceManagementReportVM> getReinsuranceManagementData() {
-		return reinsuranceManagementData;
-	}
+	public List<ReinsuranceCostReportVM> reinsuranceCostReportData;
 	public List<MembershipManagementPatientTypeVM> membershipManagementData;
 	public List<PmpmByPracticeExpandReportVM> pmpmByPracticeExpandData;
 	public List<PatientVisitExpandReportVM> patientVisitExpandReportData;
 	public List<BeneficiariesManagementReportVM> beneficiariesManagementData;
 	public List<BeneficiariesManagementByLocationReportVM>BeneficiariesManagementByLocationData;
-		public List<BeneficiariesManagementByClinicReportVM> BeneficiariesManagementByClinicData;
-	public List<BeneficiariesManagementByLocationReportVM> getBeneficiariesManagementByLocationData() {
-		return BeneficiariesManagementByLocationData;
-	}
-	public void setBeneficiariesManagementByLocationData(
-			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
-		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
-	}
+	public List<BeneficiariesManagementByClinicReportVM> BeneficiariesManagementByClinicData;
 	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementExpandData;
 	public List<DuplicateClaimsExpandVM> duplicateClaimsExpandData;
 	public List<BeneficiariesManagementByDoctorReportVM> beneficiariesManagementByDoctorData;
 	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByLocationExpandData;
 	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByClinicExpandData;
+	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByDoctorExpandData;
+	public Integer pages;
+	public Integer totalCount;
+	public String fileQuery;
 	
 	
 	public List<ReinsuranceCostReportVM> getReinsuranceCostReportData() {
@@ -76,10 +70,6 @@ public class DashboardReportsVM {
 			List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByLocationExpandData) {
 		this.beneficiariesManagementByLocationExpandData = beneficiariesManagementByLocationExpandData;
 	}
-	public List<BeneficiariesManagementExpandReportVM> beneficiariesManagementByDoctorExpandData;
-	public Integer pages;
-	public Integer totalCount;
-	public String fileQuery;
 	
 	public List<DuplicateClaimsReportVM> getDuplicateClaimsReportData() {
 		return duplicateClaimsReportData;
@@ -227,5 +217,15 @@ public class DashboardReportsVM {
 	public void setSpecialistComparisonExpandPracticeReportData(
 			List<SpecialistComparisonExpandPracticeReportVM> specialistComparisonExpandPracticeReportData) {
 		this.specialistComparisonExpandPracticeReportData = specialistComparisonExpandPracticeReportData;
+	}
+	public List<ReinsuranceManagementReportVM> getReinsuranceManagementData() {
+		return reinsuranceManagementData;
+	}
+	public List<BeneficiariesManagementByLocationReportVM> getBeneficiariesManagementByLocationData() {
+		return BeneficiariesManagementByLocationData;
+	}
+	public void setBeneficiariesManagementByLocationData(
+			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
+		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
 	}
 }
