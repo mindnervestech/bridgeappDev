@@ -50,6 +50,8 @@ import com.mnt.dao.SpecialtyClaimDetailDao;
 import com.mnt.domain.ClaimDetailsStoredResults;
 import com.mnt.domain.PrescDrugsData;
 import com.mnt.service.DashboardService;
+import com.mnt.vm.AdmissionHeaderReportFileVM;
+import com.mnt.vm.AdmissionHeaderReportVM;
 import com.mnt.vm.AdmissionsReportExpandFileVM;
 import com.mnt.vm.AdmissionsReportExpandPrintDataVM;
 import com.mnt.vm.AdmissionsReportExpandVM;
@@ -1580,6 +1582,37 @@ public class DashboardServiceImpl implements DashboardService {
 		return list;
 	}
 	
+	public List<AdmissionHeaderReportVM> getDataForAdmissionsHeaderReportXL(AdmissionHeaderReportFileVM fileVM) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = null;
+		List<AdmissionHeaderReportVM> list = new ArrayList<>();
+		resultData = instClaimDetailDao.getAdmissionsHeaderReportData(fileVM);
+		
+		for(Object[] obj: resultData) {
+			AdmissionHeaderReportVM dataVM = new AdmissionHeaderReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setPatientName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setSubscriberId(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setPcpName(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setEligibleMonth(obj[3].toString());
+			if(obj[5] != null)
+				dataVM.setTotalNoOfAdmissions(obj[5].toString());
+			if(obj[4] != null)
+				dataVM.setTotalCost("$"+formatter.format(Double.parseDouble(obj[4].toString())));
+			list.add(dataVM);
+			
+		}
+		
+
+		return list;
+	}
+	
+
+	
 	public List<AdmissionsReportExpandVM> getDataForAdmissionsReportExpandXL(AdmissionsReportExpandFileVM vm) {
 		DecimalFormat formatter = new DecimalFormat("#,###.00");
 		List<Object[]> resultData = null;
@@ -3071,6 +3104,235 @@ public class DashboardServiceImpl implements DashboardService {
 	        InputStream is = new FileInputStream(file);
 	        IOUtils.copy(is, os);
 	}
+	
+	public void generateAdmissionsHeaderReportPDF(AdmissionHeaderReportFileVM vm, OutputStream os) {
+		
+		List<AdmissionHeaderReportVM> list = getDataForAdmissionsHeaderReportXL(vm);
+		
+		File file = new File("Data export-Admissions Report.pdf");
+		if(!list.isEmpty()) {
+		 Document document = new Document();
+	        try {
+				PdfWriter.getInstance(document, new FileOutputStream(file));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        document.open();
+	        
+	        int tableColumnSize = 6;
+	     
+	        
+	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+	        
+	        @SuppressWarnings("deprecation")
+			BaseColor myColor = WebColors.getRGBColor("#2D4154");
+	        
+	        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+	       
+	        	PdfPCell cell3 = new PdfPCell(new Paragraph("Patient Name", font));
+	        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell3.setBackgroundColor(myColor);
+		        cell3.setBorderColor(BaseColor.WHITE);
+		        cell3.setBorderWidth(0.1f);
+	        	table.addCell(cell3);
+	        
+	            PdfPCell cell1 = new PdfPCell(new Paragraph("HICN/Subscriber ID", font));
+		        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell1.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell1.setBackgroundColor(myColor);
+		        cell1.setBorderColor(BaseColor.WHITE);
+		        cell1.setBorderWidth(0.1f);
+		        table.addCell(cell1);
+	        
+		        PdfPCell cell4 = new PdfPCell(new Paragraph("PCP Name", font));
+	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell4.setBackgroundColor(myColor);
+		        cell4.setBorderColor(BaseColor.WHITE);
+		        cell4.setBorderWidth(0.1f);
+	        	table.addCell(cell4);
+	        
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("Eligible Month", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Number Of Admissions", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        
+	        	PdfPCell cell8 = new PdfPCell(new Paragraph("Total Cost", font));
+	        	cell8.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell8.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell8.setBackgroundColor(myColor);
+		        cell8.setBorderColor(BaseColor.WHITE);
+		        cell8.setBorderWidth(0.1f);
+	        	table.addCell(cell8);
+	        	     
+	        	table.setHeaderRows(1);
+	        
+	        	BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+	        
+	        	int count = 1; //table rows
+	        	
+	        	for(AdmissionHeaderReportVM rvm: list) {
+	        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+	        	
+		        	PdfPCell rowCell3 = new PdfPCell(new Paragraph(rvm.getPatientName(), rowFont));
+			        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell3.setBackgroundColor(oddRowColor);
+			        rowCell3.setBorderColor(BaseColor.WHITE);
+			        rowCell3.setBorderWidth(0.1f);
+			        table.addCell(rowCell3);
+		        
+	        	    PdfPCell rowCell1 = new PdfPCell(new Paragraph(rvm.getSubscriberId(), rowFont));
+			        rowCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell1.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell1.setBackgroundColor(oddRowColor);
+			        rowCell1.setBorderColor(BaseColor.WHITE);
+			        rowCell1.setBorderWidth(0.1f);
+			        table.addCell(rowCell1);
+	        	
+		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(rvm.getPcpName(), rowFont));
+			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell4.setBackgroundColor(oddRowColor);
+			        rowCell4.setBorderColor(BaseColor.WHITE);
+			        rowCell4.setBorderWidth(0.1f);
+			        table.addCell(rowCell4);
+		        
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(rvm.getEligibleMonth(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        
+		        	PdfPCell rowCell6 = new PdfPCell(new Paragraph(rvm.getTotalNoOfAdmissions(), rowFont));
+			        rowCell6.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell6.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell6.setBackgroundColor(oddRowColor);
+			        rowCell6.setBorderColor(BaseColor.WHITE);
+			        rowCell6.setBorderWidth(0.1f);
+			        table.addCell(rowCell6);
+		        
+		        	PdfPCell rowCell8 = new PdfPCell(new Paragraph(rvm.getTotalCost(), rowFont));
+			        rowCell8.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell8.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell8.setBackgroundColor(oddRowColor);
+			        rowCell8.setBorderColor(BaseColor.WHITE);
+			        rowCell8.setBorderWidth(0.1f);
+			        table.addCell(rowCell8);
+		        
+		        
+		        count++;
+	        }
+	        
+	    
+	        try {
+	        	  table.setWidthPercentage(100);
+	  	        document.add(table);
+	  	        document.close();
+	  	        InputStream is = new FileInputStream(file);
+	  	        IOUtils.copy(is, os);
+			} catch (DocumentException | IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
+		
+		else
+		{
+			Document document = new Document();
+	        try {
+				PdfWriter.getInstance(document, new FileOutputStream(file));
+			} catch (FileNotFoundException e) {
+				
+				e.printStackTrace();
+			} catch (DocumentException e) {
+			
+				e.printStackTrace();
+			}
+	        document.open();
+	        
+	        int tableColumnSize = 1;
+	     
+	        
+	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+	        
+	        @SuppressWarnings("deprecation")
+			BaseColor myColor = WebColors.getRGBColor("#2D4154");
+	        
+	        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+	       
+	        	PdfPCell cell3 = new PdfPCell(new Paragraph("Report has No data!!!!", font));
+	        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell3.setBackgroundColor(myColor);
+		        cell3.setBorderColor(BaseColor.WHITE);
+		        cell3.setBorderWidth(0.1f);
+	        	table.addCell(cell3);
+	             
+	        	table.setHeaderRows(1);
+	        
+	        	BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+	        
+	        	int count = 1; //table rows
+	        	
+	        	
+	        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+	        	
+		        	PdfPCell rowCell3 = new PdfPCell(new Paragraph("", rowFont));
+			        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell3.setBackgroundColor(oddRowColor);
+			        rowCell3.setBorderColor(BaseColor.WHITE);
+			        rowCell3.setBorderWidth(0.1f);
+			        table.addCell(rowCell3);
+		        
+		        
+		        
+		        count++;
+	        
+	        
+	    
+		        try {
+		        	table.setWidthPercentage(100);
+		        	document.add(table);
+		        	document.close();
+		        	InputStream is = new FileInputStream(file);
+		        	IOUtils.copy(is, os);
+		        } catch (DocumentException | IOException e) {
+				
+		        	e.printStackTrace();
+		        }
+		}
+}
+			
+		
+	
+	
 	
 	public void generatePatientVisitReportPDF(PatientVisitReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
 		
@@ -8405,6 +8667,114 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
 	      fileOut.close();
 	}
+	
+	public void generateAdmissionsHeaderReportXLSX(AdmissionHeaderReportFileVM fileVM, OutputStream os)  throws IOException {
+		
+		Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Admissions Report");
+
+	    org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+	    headerFont.setBold(true);
+	    headerFont.setFontHeightInPoints((short) 12);
+
+	    CellStyle headerCellStyle = workbook.createCellStyle();
+	    headerCellStyle.setFont(headerFont);
+	    
+	 // Create a Row
+	    Row headerRow = sheet.createRow(0);
+	    int headerIndex = 0;
+	    
+	    List<AdmissionHeaderReportVM> list = getDataForAdmissionsHeaderReportXL(fileVM);
+	    if(!list.isEmpty()) {
+	 
+	    Cell cell1 = headerRow.createCell(headerIndex);
+	    cell1.setCellValue("Patient Name");
+	    cell1.setCellStyle(headerCellStyle);
+	    
+	    Cell cell0 = headerRow.createCell(++headerIndex);
+	    cell0.setCellValue("HICN/Subscriber ID");
+	    cell0.setCellStyle(headerCellStyle);
+	    
+	    Cell cell2 = headerRow.createCell(++headerIndex);
+	    cell2.setCellValue("PCP Name");
+	    cell2.setCellStyle(headerCellStyle);
+	      
+	    Cell cell3 = headerRow.createCell(++headerIndex);
+	    cell3.setCellValue("Eligible Month");
+	    cell3.setCellStyle(headerCellStyle);
+	      
+	    Cell cell4 = headerRow.createCell(++headerIndex);
+	    cell4.setCellValue("Total Number Of Admissions");
+	    cell4.setCellStyle(headerCellStyle);
+	    
+	    Cell cell5 = headerRow.createCell(++headerIndex);
+	    cell5.setCellValue("Total Cost");
+	    cell5.setCellStyle(headerCellStyle);
+	      
+	      
+	   // Create Other rows and cells
+	      int rowNum = 1;
+	      int rowIndex = 0;
+	  
+	     
+	     
+	      for (AdmissionHeaderReportVM vm : list) {
+	    	  rowIndex = 0;
+	    	  Row row = sheet.createRow(rowNum);
+	    	  row.createCell(rowIndex).setCellValue(vm.getPatientName());
+		      row.createCell(++rowIndex).setCellValue(vm.getSubscriberId());
+	    	  row.createCell(++rowIndex).setCellValue(vm.getPcpName());
+		      row.createCell(++rowIndex).setCellValue(vm.getEligibleMonth());
+		      row.createCell(++rowIndex).setCellValue(vm.getTotalNoOfAdmissions());
+		      row.createCell(++rowIndex).setCellValue(vm.getTotalCost());
+		      rowNum = rowNum + 1;
+		      
+	        }
+	      
+	   // Resize all columns to fit the content size
+	      for(int i=0;i<headerIndex;i++) {
+	    	  sheet.autoSizeColumn(i);
+	      }
+	      FileOutputStream fileOut = new FileOutputStream("Data export-Admissions Report Search.xlsx");
+	      workbook.write(fileOut);
+	      InputStream is = new FileInputStream(new File("Data export-Admissions Report Search.xlsx"));
+	      IOUtils.copy(is, os);
+	      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
+	      fileOut.close();
+	     }
+	     else {
+	     
+	    	   
+	    	    
+	    	    Cell cell = headerRow.createCell(++headerIndex);
+	    	    cell.setCellValue("Report has No Data!!!!");
+	    	    cell.setCellStyle(headerCellStyle);
+	    	      
+	    	      
+	    	   // Create Other rows and cells
+	    	      int rowNum = 1;
+	    	      int rowIndex = 0;
+		    	  rowIndex = 0;
+		    	  Row row = sheet.createRow(rowNum);
+		    	  row.createCell(rowIndex).setCellValue("");
+
+			      rowNum = rowNum + 1;
+			  
+		   // Resize all columns to fit the content size
+		      for(int i=0;i<headerIndex;i++) {
+		    	  sheet.autoSizeColumn(i);
+		      }
+		      FileOutputStream fileOut = new FileOutputStream("Data export-Admissions Report Search.xlsx");
+		      workbook.write(fileOut);
+		      InputStream is = new FileInputStream(new File("Data export-Admissions Report Search.xlsx"));
+		      IOUtils.copy(is, os);
+		      //Files.copy(new File("Data export-Claims Search.xlsx").toPath(), os);
+		      fileOut.close();
+	     }
+	}
+	
+	
+
 	
 	public void generatePatientVisitReportXLSX(PatientVisitReportFileVM fileVM, OutputStream os)  throws IOException {
 

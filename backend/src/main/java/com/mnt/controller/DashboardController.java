@@ -30,6 +30,7 @@ import com.mnt.domain.HccCodeValues;
 import com.mnt.domain.MonthlyTotalsData;
 import com.mnt.domain.MonthlyTotalsReport;
 import com.mnt.service.DashboardService;
+import com.mnt.vm.AdmissionHeaderReportFileVM;
 import com.mnt.vm.AdmissionsReportExpandFileVM;
 import com.mnt.vm.AdmissionsReportExpandPrintDataVM;
 import com.mnt.vm.AdmissionsReportFileVM;
@@ -591,6 +592,33 @@ public class DashboardController {
 		return csv;
 	}
 	
+	@RequestMapping(value="/renderAdmissionsReportHeaderXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderAdmissionsHeaderReportXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		AdmissionHeaderReportFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), AdmissionHeaderReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Admissions Report" + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateAdmissionsHeaderReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
 	@RequestMapping(value="/renderAdmissionsReportXLSX/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderAdmissionsReportXLSX(@PathVariable String json, HttpServletResponse response) {
@@ -639,6 +667,38 @@ public class DashboardController {
 			OutputStream outputStream = response.getOutputStream();
 			dashboardService.generateAdmissionsReportPDF(fileVM,outputStream);
 			outputStream.close();
+			response.flushBuffer();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+	@RequestMapping(value="/renderAdmissionsReportHeaderPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderAdmissionsReportHeaderPDF(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		AdmissionHeaderReportFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), AdmissionHeaderReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Admissions Report" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateAdmissionsHeaderReportPDF(fileVM,outputStream);
+			outputStream.close();	
 			response.flushBuffer();
 		} catch (SQLException e) {
 			e.printStackTrace();

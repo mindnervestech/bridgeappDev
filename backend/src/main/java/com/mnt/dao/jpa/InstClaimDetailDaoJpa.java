@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mnt.dao.InstClaimDetailDao;
 import com.mnt.domain.InstClaimDetail;
+import com.mnt.vm.AdmissionHeaderReportFileVM;
 import com.mnt.vm.FilteredVM;
 import com.mnt.vm.ReportResponseVM;
 import com.mnt.vm.ReportVM;
@@ -3217,6 +3218,40 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		responseVM.setTotalCount(totalCount);
 		responseVM.setFileQuery(fileQuery);
 		return responseVM;
+	}
+	
+	public List<Object[]> getAdmissionsHeaderReportData(AdmissionHeaderReportFileVM vm) {
+	
+		String conditionStr="", countQueryStr="";
+		
+		if(!vm.getProvider().equals("all"))
+			conditionStr+=" and provider = '"+vm.getProvider()+"' ";
+		
+		if(!vm.getPcpName().equals("all")) {
+			if(!vm.getProvider().equals("all"))
+				conditionStr+=" and pcp_id = '"+vm.getPcpName()+"' ";
+			else
+				conditionStr=" and pcp_name = '"+vm.getPcpName()+"' ";
+		}
+		if(!vm.getYear().equals("all"))
+			conditionStr+=" and first_service_date like '"+vm.getYear()+"%' ";
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		
+		String queryStr="select member_name,medicare_id,pcp_name,service_date as eligibleMonth, paid_amount as total,first_service_date \r\n" + 
+						"from inst_claim_detail\r\n" + 
+						"where admitting_diagnosis is not null "+conditionStr+"\r\n" + 
+						"order by total desc";
+	
+			countQueryStr = "select count(*) from (\n" + queryStr;	
+			System.out.println(queryStr);	
+		Query query = getEntityManager().createNativeQuery(queryStr);
+		queryResult = query.getResultList();
+		
+		
+		System.out.println(countQueryStr+ ") A");
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+" ) A");
+		return queryResult;
 	}
 	
 	public ReportResponseVM getAdmissionsReportExpandData(ReportVM vm) {

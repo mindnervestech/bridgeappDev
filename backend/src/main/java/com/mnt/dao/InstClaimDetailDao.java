@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.mnt.domain.InstClaimDetail;
+import com.mnt.vm.AdmissionHeaderReportFileVM;
 import com.mnt.vm.ReportResponseVM;
 import com.mnt.vm.ReportVM;
 
@@ -24,4 +25,5 @@ public interface InstClaimDetailDao extends BaseDao<InstClaimDetail> {
 	public ReportResponseVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm);
 	public List<Object[]> getDataForFile(String fileQuery);
 	public List<Object[]> getDuplicateClaimsAllData(String fileQuery);
+	public List<Object[]> getAdmissionsHeaderReportData(AdmissionHeaderReportFileVM vm);
 }

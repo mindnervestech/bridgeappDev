@@ -187,6 +187,8 @@ public interface DashboardService {
 	public List<ReinsuranceCostReportPrintDataVM> getDataForReinsuranceCostReportPrint(ReinsuranceCostReportFileVM vm);
 	public void generateReinsuranceCostReportXLSX(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws IOException;
 	public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public void generateAdmissionsHeaderReportPDF(AdmissionHeaderReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public void generateAdmissionsHeaderReportXLSX(AdmissionHeaderReportFileVM fileVM, OutputStream outputStream) throws IOException;
 
 
 }
