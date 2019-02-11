@@ -9,7 +9,17 @@ public class SpecialistComparisonExpandPracticeReportVM {
 	public String numberOfClaims;
 	public String averageCostPerClaim;
 	public String cost;
+	public String medicareId;
 	
+	
+	
+
+	public String getMedicareId() {
+		return medicareId;
+	}
+	public void setMedicareId(String medicareId) {
+		this.medicareId = medicareId;
+	}
 	public String getPracticeName() {
 		return practiceName;
 	}

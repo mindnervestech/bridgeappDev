@@ -126,6 +126,9 @@ import com.mnt.vm.reports.SettledMonthsExpandReportVM;
 import com.mnt.vm.reports.SettledMonthsReportFileVM;
 import com.mnt.vm.reports.SettledMonthsReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsReportVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientPrintDataVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportFileVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportFileVM;
@@ -1490,6 +1493,39 @@ public class DashboardServiceImpl implements DashboardService {
 		return gridVM;
 	}
 	
+	public DashboardReportsVM getSpecialistComparisonExpandPatientReportData(ReportVM vm) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = null;
+		Integer noOfPages = 0;
+		List<SpecialistComparisonExpandPatientReportVM> list = new ArrayList<>();
+		DashboardReportsVM gridVM = new DashboardReportsVM();
+		ReportResponseVM responseVM = instClaimDetailDao.getSpecialistComparisonExpandPatientReportData(vm);
+		resultData = responseVM.getDataList();
+		noOfPages = responseVM.getNoOfPages();
+		
+		for(Object[] obj: resultData) {
+			SpecialistComparisonExpandPatientReportVM dataVM = new SpecialistComparisonExpandPatientReportVM();
+			
+			if(obj[0] != null)
+				dataVM.setPracticeName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setSpecialityType(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setPatientName(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setPcpName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[4].toString())));
+			list.add(dataVM);
+			//vm.setMedicareId("");
+		}
+		gridVM.setSpecialistComparisonExpandPatientReportData(list);
+		gridVM.setPages(noOfPages);
+		gridVM.setTotalCount(responseVM.getTotalCount());
+		gridVM.setFileQuery(responseVM.getFileQuery());
+		return gridVM;
+	}
+	
 	public DashboardReportsVM getSpecialistComparisonExpandPracticeReportData(ReportVM vm) {
 		DecimalFormat formatter = new DecimalFormat("#,###.00");
 		List<Object[]> resultData = null;
@@ -1517,6 +1553,9 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[5].toString())));
 			if(obj[6] != null)
 				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[6].toString())));
+			if(obj[7]!=null)
+				dataVM.setMedicareId(obj[7].toString());
+			
 			
 			list.add(dataVM);
 		}
@@ -2452,6 +2491,30 @@ public class DashboardServiceImpl implements DashboardService {
 		return list;
 	}
 	
+	public List<SpecialistComparisonExpandPatientPrintDataVM> getDataForSpecialistComparisonPatientExpandPrint(SpecialistComparisonExpandPatientReportFileVM fileVM) {
+		DecimalFormat formatter = new DecimalFormat("#,###.00");
+		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
+		System.out.println(fileVM.getFileQuery());
+		List<SpecialistComparisonExpandPatientPrintDataVM> list = new ArrayList<>();
+		
+		for(Object[] obj: resultData) {
+			SpecialistComparisonExpandPatientPrintDataVM dataVM = new SpecialistComparisonExpandPatientPrintDataVM();
+			
+			if(obj[0] != null)
+				dataVM.setPracticeName(obj[0].toString());
+			if(obj[1] != null)
+				dataVM.setSpecialityType(obj[1].toString());
+			if(obj[2] != null)
+				dataVM.setPatientName(obj[2].toString());
+			if(obj[3] !=null)
+				dataVM.setPcpName(obj[3].toString());
+			if(obj[4] != null)
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[4].toString())));
+			list.add(dataVM);
+		}
+		
+		return list;
+	}
 	public List<SpecialistComparisonExpandPrintDataVM> getDataForSpecialistComparisonExpandPrint(SpecialistComparisonExpandReportFileVM fileVM) {
 		DecimalFormat formatter = new DecimalFormat("#,###.00");
 		List<Object[]> resultData = instClaimDetailDao.getDataForFile(fileVM.getFileQuery());
@@ -8321,6 +8384,146 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	        IOUtils.copy(is, os);
 	}
 	
+	public void generateSpecialistComparisonExpandPatientReportPDF(SpecialistComparisonExpandPatientReportFileVM fileVM, OutputStream os) throws SQLException, IOException, DocumentException {
+
+		List<SpecialistComparisonExpandPatientPrintDataVM> list = getDataForSpecialistComparisonPatientExpandPrint(fileVM);
+		
+		File file = new File("Data export-Specialist Comparison Expand Patient Report.pdf");
+		 Document document = new Document();
+	        PdfWriter.getInstance(document, new FileOutputStream(file));
+	        document.open();
+	        
+	        int tableColumnSize = 0;
+	        if(fileVM.showPracticeName_specialistComparisonPatientExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showSpecialityType_specialistComparisonPatientExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showPatientName_specialistComparisonPatientExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showPcpName_specialistComparisonPatientExpand)
+	        	tableColumnSize++;
+	        if(fileVM.showCost_specialistComparisonPatientExpand)
+	        	tableColumnSize++;
+	        
+	        PdfPTable table = new PdfPTable(tableColumnSize);//columns
+	        
+	        @SuppressWarnings("deprecation")
+			BaseColor myColor = WebColors.getRGBColor("#2D4154");
+	        
+	        Font font = new Font(FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+	        if(fileVM.showPracticeName_specialistComparisonPatientExpand) {
+	        	PdfPCell cell3 = new PdfPCell(new Paragraph("Practice Name", font));
+	        	cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell3.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell3.setBackgroundColor(myColor);
+		        cell3.setBorderColor(BaseColor.WHITE);
+		        cell3.setBorderWidth(0.1f);
+	        	table.addCell(cell3);
+	        }
+	        if(fileVM.showSpecialityType_specialistComparisonPatientExpand) {
+		        PdfPCell cell1 = new PdfPCell(new Paragraph("Speciality Type", font));
+		        cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell1.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell1.setBackgroundColor(myColor);
+		        cell1.setBorderColor(BaseColor.WHITE);
+		        cell1.setBorderWidth(0.1f);
+		        table.addCell(cell1);
+	        }
+	        if(fileVM.showPatientName_specialistComparisonPatientExpand) {
+	        	PdfPCell cell4 = new PdfPCell(new Paragraph("Patient Name", font));
+	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell4.setBackgroundColor(myColor);
+		        cell4.setBorderColor(BaseColor.WHITE);
+		        cell4.setBorderWidth(0.1f);
+	        	table.addCell(cell4);
+	        }
+	        if(fileVM.showPcpName_specialistComparisonPatientExpand) {
+	        	PdfPCell cell5 = new PdfPCell(new Paragraph("PCP Name", font));
+	        	cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell5.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell5.setBackgroundColor(myColor);
+		        cell5.setBorderColor(BaseColor.WHITE);
+		        cell5.setBorderWidth(0.1f);
+	        	table.addCell(cell5);
+	        }
+	        if(fileVM.showCost_specialistComparisonPatientExpand) {
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Cost", font));
+	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell7.setBackgroundColor(myColor);
+		        cell7.setBorderColor(BaseColor.WHITE);
+		        cell7.setBorderWidth(0.1f);
+	        	table.addCell(cell7);
+	        }
+	        
+	        table.setHeaderRows(1);
+	        
+	        BaseColor oddRowColor = WebColors.getRGBColor("#F3F3F3");
+
+	        int count = 1; //table rows
+	        for(SpecialistComparisonExpandPatientPrintDataVM vm: list) {
+	        	Font rowFont = new Font(FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.BLACK);
+	        	if(fileVM.showPracticeName_specialistComparisonPatientExpand) {
+		        	PdfPCell rowCell3 = new PdfPCell(new Paragraph(vm.getPracticeName(), rowFont));
+			        rowCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell3.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell3.setBackgroundColor(oddRowColor);
+			        rowCell3.setBorderColor(BaseColor.WHITE);
+			        rowCell3.setBorderWidth(0.1f);
+			        table.addCell(rowCell3);
+		        }
+	        	if(fileVM.showSpecialityType_specialistComparisonPatientExpand) {
+			        PdfPCell rowCell1 = new PdfPCell(new Paragraph(vm.getSpecialityType(), rowFont));
+			        rowCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell1.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell1.setBackgroundColor(oddRowColor);
+			        rowCell1.setBorderColor(BaseColor.WHITE);
+			        rowCell1.setBorderWidth(0.1f);
+			        table.addCell(rowCell1);
+	        	}
+		        if(fileVM.showPatientName_specialistComparisonPatientExpand) {
+		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getPatientName(), rowFont));
+			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell4.setBackgroundColor(oddRowColor);
+			        rowCell4.setBorderColor(BaseColor.WHITE);
+			        rowCell4.setBorderWidth(0.1f);
+			        table.addCell(rowCell4);
+		        }
+		        if(fileVM.showPcpName_specialistComparisonPatientExpand) {
+		        	PdfPCell rowCell5 = new PdfPCell(new Paragraph(vm.getPcpName(), rowFont));
+			        rowCell5.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell5.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell5.setBackgroundColor(oddRowColor);
+			        rowCell5.setBorderColor(BaseColor.WHITE);
+			        rowCell5.setBorderWidth(0.1f);
+			        table.addCell(rowCell5);
+		        }
+		        if(fileVM.showCost_specialistComparisonPatientExpand) {
+		        	PdfPCell rowCell6 = new PdfPCell(new Paragraph(vm.getCost(), rowFont));
+			        rowCell6.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell6.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell6.setBackgroundColor(oddRowColor);
+			        rowCell6.setBorderColor(BaseColor.WHITE);
+			        rowCell6.setBorderWidth(0.1f);
+			        table.addCell(rowCell6);
+		        }
+		        
+		        count++;
+	        }
+	        
+	        table.setWidthPercentage(100);
+	        document.add(table);
+	        document.close();
+	        InputStream is = new FileInputStream(file);
+	        IOUtils.copy(is, os);
+	}
 	public MembershipManagementVM getMembershipManagementData(ReportVM vm) {
 		return demographicDetailDao.getMembershipManagementData(vm);
 	}
@@ -11662,5 +11865,94 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 		return list;
 	}
 	
+	public void generateSpecialistComparisonExpandPatientReportXLSX(SpecialistComparisonExpandPatientReportFileVM fileVM, OutputStream os)  throws IOException {
+
+		Workbook workbook = new XSSFWorkbook();
+	    Sheet sheet = workbook.createSheet("Specialist Comparison Expand Patient Report");
+
+	    org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+	    headerFont.setBold(true);
+	    headerFont.setFontHeightInPoints((short) 12);
+
+	    CellStyle headerCellStyle = workbook.createCellStyle();
+	    headerCellStyle.setFont(headerFont);
+	    
+	 // Create a Row
+	    Row headerRow = sheet.createRow(0);
+	    int headerIndex = 0;
+	  
+
+	    if(fileVM.showPracticeName_specialistComparisonPatientExpand) {
+	    	Cell cell1 = headerRow.createCell(headerIndex);
+	    	cell1.setCellValue("Practice Name");
+	    	cell1.setCellStyle(headerCellStyle);
+	    }
+	      
+	    if(fileVM.showSpecialityType_specialistComparisonPatientExpand) {
+	      Cell cell0 = headerRow.createCell(++headerIndex);
+	      cell0.setCellValue("Speciality Type");
+	      cell0.setCellStyle(headerCellStyle);
+	    }
+	      
+	      if(fileVM.showPatientName_specialistComparisonPatientExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Patient Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	      if(fileVM.showPcpName_specialistComparisonPatientExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("PCP Name");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	  
+	      if(fileVM.showCost_specialistComparisonPatientExpand) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("Cost");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	      
+	   // Create Other rows and cells
+	      int rowNum = 1;
+	      int rowIndex = 0;
+	      List<SpecialistComparisonExpandPatientPrintDataVM> list = getDataForSpecialistComparisonPatientExpandPrint(fileVM);
+	      for (SpecialistComparisonExpandPatientPrintDataVM vm : list) {
+	    	  rowIndex = 0;
+	    	  Row row = sheet.createRow(rowNum);
+	    	  
+	    	  if(fileVM.showPracticeName_specialistComparisonPatientExpand) {
+		    	  row.createCell(rowIndex).setCellValue(vm.getPracticeName());
+		      }
+		      
+	    	  if(fileVM.showSpecialityType_specialistComparisonPatientExpand) {
+	          	  row.createCell(++rowIndex).setCellValue(vm.getSpecialityType());
+	    	  }
+		    
+		      if(fileVM.showPatientName_specialistComparisonPatientExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPatientName());
+		      }
+		      
+		      if(fileVM.showPcpName_specialistComparisonPatientExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getPcpName());
+		      }
+		  
+		      if(fileVM.showCost_specialistComparisonPatientExpand) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getCost());
+		      }
+		      
+		      rowNum = rowNum + 1;
+		      
+	        }
+	      
+	   // Resize all columns to fit the content size
+	      for(int i=0;i<headerIndex;i++) {
+	    	  sheet.autoSizeColumn(i);
+	      }
+	      FileOutputStream fileOut = new FileOutputStream("Data export-Specialist Comparison Expand Patient Report Search.xlsx");
+	      workbook.write(fileOut);
+	      InputStream is = new FileInputStream(new File("Data export-Specialist Comparison Expand Patient Report Search.xlsx"));
+	      IOUtils.copy(is, os);
+	      fileOut.close();
+	}
 	
 }

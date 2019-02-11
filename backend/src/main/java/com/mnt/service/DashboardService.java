@@ -58,6 +58,8 @@ import com.mnt.vm.reports.SettledMonthsExpandReportFileVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportPrintDataVM;
 import com.mnt.vm.reports.SettledMonthsReportFileVM;
 import com.mnt.vm.reports.SettledMonthsReportPrintDataVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientPrintDataVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportFileVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportFileVM;
 
@@ -189,6 +191,15 @@ public interface DashboardService {
 	public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
 	public void generateAdmissionsHeaderReportPDF(AdmissionHeaderReportFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
 	public void generateAdmissionsHeaderReportXLSX(AdmissionHeaderReportFileVM fileVM, OutputStream outputStream) throws IOException;
+	public DashboardReportsVM getSpecialistComparisonExpandPatientReportData(ReportVM vm);
+	public List<SpecialistComparisonExpandPatientPrintDataVM> getDataForSpecialistComparisonPatientExpandPrint(
+			SpecialistComparisonExpandPatientReportFileVM vm);
+	public void generateSpecialistComparisonExpandPatientReportPDF(SpecialistComparisonExpandPatientReportFileVM fileVM,
+			OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public void generateSpecialistComparisonExpandPatientReportXLSX(SpecialistComparisonExpandPatientReportFileVM fileVM,
+			OutputStream outputStream) throws IOException;
+
+
 
 
 }

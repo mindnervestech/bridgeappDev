@@ -15,6 +15,7 @@ import com.mnt.vm.reports.ReinsuranceCostReportVM;
 import com.mnt.vm.reports.ReinsuranceManagementReportVM;
 import com.mnt.vm.reports.SettledMonthsExpandReportVM;
 import com.mnt.vm.reports.SettledMonthsReportVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportVM;
 
@@ -26,6 +27,8 @@ public class DashboardReportsVM {
 	public List<SpecialistComparisonReportVM> specialistComparisonReportData;
 	public List<SpecialistComparisonExpandReportVM> specialistComparisonExpandReportData;
 	public List<SpecialistComparisonExpandPracticeReportVM> specialistComparisonExpandPracticeReportData;
+	public List<SpecialistComparisonExpandPatientReportVM> specialistComparisonExpandPatientReportData;
+	
 	public List<PatientVisitReportVM> patientVisitReportData;
 	public List<SummaryReportVM> summaryReportData;
 	public List<SettledMonthsReportVM> settledMonthsData;
@@ -227,5 +230,13 @@ public class DashboardReportsVM {
 	public void setBeneficiariesManagementByLocationData(
 			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
 		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
+	
+	
+	public List<SpecialistComparisonExpandPatientReportVM> getSpecialistComparisonExpandPatientReportData() {
+		return specialistComparisonExpandPatientReportData;
+	}
+	public void setSpecialistComparisonExpandPatientReportData(
+			List<SpecialistComparisonExpandPatientReportVM> specialistComparisonExpandPatientReportData) {
+		this.specialistComparisonExpandPatientReportData = specialistComparisonExpandPatientReportData;
 	}
 }

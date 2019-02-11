@@ -3795,8 +3795,154 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		noOfPages = totalCount/vm.getPageSize();
 		if(totalCount % vm.getPageSize() > 0)
 			noOfPages++;
+		String fileQuery;
 		
-		String fileQuery = queryStr+sortCountQryStr;
+		if(sortCountQryStr!="") 
+			fileQuery = queryStr+sortCountQryStr;
+		else
+			fileQuery=queryStr+sortQryStr;
+	
+	
+		
+		responseVM.setDataList(queryResult);
+		responseVM.setNoOfPages(noOfPages);
+		responseVM.setTotalCount(totalCount);
+		responseVM.setFileQuery(fileQuery);
+		return responseVM;
+	}
+	
+	public ReportResponseVM getSpecialistComparisonExpandPatientReportData(ReportVM vm) {
+		ReportResponseVM responseVM = new ReportResponseVM();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		List<SortedVM> sortedList = null;
+		List<FilteredVM> filteredList = null;
+		try {
+			sortedList = mapper.readValue(vm.getSortedColumns(), new TypeReference<List<SortedVM>>(){});
+			filteredList = mapper.readValue(vm.getFilteredColumns(), new TypeReference<List<FilteredVM>>(){});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		String filterStr = "",havingStr = "";
+		String filterColumnName = "";
+		for(int i=0;i<filteredList.size();i++) {
+			if(filteredList.get(i).getId().equals("practiceName")) {
+				filterColumnName = "provider_name";
+			}
+			if(filteredList.get(i).getId().equals("specialityType")) {
+				filterColumnName = "claim_specialty";
+			}
+			if(filteredList.get(i).getId().equals("patientName")) {
+				filterColumnName = "member_name";
+			}
+			if(filteredList.get(i).getId().equals("pcpName")) {
+				filterColumnName = "pcp_name";
+			}
+			if(filteredList.get(i).getId().equals("cost")) {
+				filterColumnName = "cost";
+			}
+			
+			if(filterColumnName.equals("provider_name") || filterColumnName.equals("claim_specialty") || filterColumnName.equals("member_name") || filterColumnName.equals("pcp_name")) {
+				filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+				
+			if(filterColumnName.equals("cost")) {
+				if(!havingStr.equals("")) {
+					havingStr += "and ";
+				} else {
+					havingStr = " having ";
+				}
+				havingStr += filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
+			}
+			
+		}
+		
+		String sortStr = "";
+		String sortColName = "";
+		if(!sortedList.isEmpty()) {
+			if(sortedList.get(0).getId().equals("practiceName")) {
+				sortColName = "provider_name";
+			}
+			if(sortedList.get(0).getId().equals("specialityType")) {
+				sortColName = "claim_specialty";
+			}
+			if(sortedList.get(0).getId().equals("patientName")) {
+				sortColName = "member_name";
+			}
+			if(sortedList.get(0).getId().equals("pcpName")) {
+				sortColName = "pcp_name";
+			}
+	
+			if(sortedList.get(0).getId().equals("cost")) {
+				sortColName = "cost";
+			}
+			if(!sortColName.equals("")) {
+				sortStr+= " "+sortColName+" ";
+				if(sortedList.get(0).isDesc()) {
+					sortStr += "desc";
+				} else {
+					sortStr += "asc";
+				}
+			}
+		}
+		
+		List<Object[]> queryResult = new ArrayList<>();
+		int start,end,noOfPages = 0,totalCount = 0;
+		end = vm.getPageSize() * vm.getPage();
+		start = end - vm.getPageSize();
+		end = vm.getPageSize();
+		
+		String sortQryStr = " order by cost desc limit "+start+","+end;
+		String sortCountQryStr = "";
+		if(!sortStr.equals("")) {
+			sortQryStr = " order by "+sortStr+" limit "+start+","+end;
+			sortCountQryStr = " order by "+sortStr;
+		}
+		
+		String queryStr = "",countQueryStr = "",conditionStr = "";
+		
+		if(!vm.getProvider().equals("all")) {
+			conditionStr = conditionStr + " and provider="+'\''+vm.getProvider()+'\'';
+		}
+		if(!vm.getPcpName().equals("all")) {
+			if(!vm.getProvider().equals("all"))
+				conditionStr = conditionStr + " and pcp_id="+'\''+vm.getPcpName()+'\'';
+			else 
+				conditionStr = conditionStr + " and pcp_name="+'\''+vm.getPcpName()+'\'';
+		}
+		if(!vm.getYear().equals("all")) {
+			conditionStr = conditionStr + " and first_service_date like "+'\''+vm.getYear()+"%"+'\'';
+		}
+		if(!vm.getMedicareId().equals(""))
+			conditionStr= conditionStr+" and medicare_id = '"+vm.getMedicareId()+"' ";
+		
+		
+		queryStr = "select provider_name,claim_specialty,member_name,pcp_name,round((paid_amount),2) as cost, medicare_id from prof_claim_detail "+
+					"where provider_name='"+vm.getPracticeName()+"' "+conditionStr+filterStr+havingStr; 
+		
+		countQueryStr = "select count(*) from \n" + 
+				"(\n" + 
+				queryStr;
+		
+		System.out.println(queryStr+sortQryStr);
+		
+		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
+		queryResult = query.getResultList();
+		
+		System.out.println(countQueryStr+sortCountQryStr);
+		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
+		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
+		noOfPages = totalCount/vm.getPageSize();
+		if(totalCount % vm.getPageSize() > 0)
+			noOfPages++;
+		String fileQuery;
+		
+		if(sortCountQryStr!="") 
+			fileQuery = queryStr+sortCountQryStr;
+		else
+			fileQuery=queryStr+sortQryStr;
+	
+	
 		
 		responseVM.setDataList(queryResult);
 		responseVM.setNoOfPages(noOfPages);
