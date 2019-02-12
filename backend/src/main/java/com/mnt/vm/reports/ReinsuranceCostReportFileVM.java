@@ -5,8 +5,7 @@ public class ReinsuranceCostReportFileVM {
 	public String fileQuery;
 	public boolean showPlanName_reinsuranceCostReport;
 	public boolean showPolicyPeriod_reinsuranceCostReport;
-	public boolean showPatientLastName_reinsuranceCostReport;
-	public boolean showPatientFirstName_reinsuranceCostReport;
+	public boolean showPatientName_reinsuranceCostReport;
 	public boolean showSubscriberID_reinsuranceCostReport;
 	public boolean showEffectiveDate_reinsuranceCostReport;
 	public boolean showTermedMonth_reinsuranceCostReport;
@@ -34,17 +33,12 @@ public class ReinsuranceCostReportFileVM {
 	public void setShowPolicyPeriod_reinsuranceCostReport(boolean showPolicyPeriod_reinsuranceCostReport) {
 		this.showPolicyPeriod_reinsuranceCostReport = showPolicyPeriod_reinsuranceCostReport;
 	}
-	public boolean isShowPatientLastName_reinsuranceCostReport() {
-		return showPatientLastName_reinsuranceCostReport;
+	
+	public boolean isShowPatientName_reinsuranceCostReport() {
+		return showPatientName_reinsuranceCostReport;
 	}
-	public void setShowPatientLastName_reinsuranceCostReport(boolean showPatientLastName_reinsuranceCostReport) {
-		this.showPatientLastName_reinsuranceCostReport = showPatientLastName_reinsuranceCostReport;
-	}
-	public boolean isShowPatientFirstName_reinsuranceCostReport() {
-		return showPatientFirstName_reinsuranceCostReport;
-	}
-	public void setShowPatientFirstName_reinsuranceCostReport(boolean showPatientFirstName_reinsuranceCostReport) {
-		this.showPatientFirstName_reinsuranceCostReport = showPatientFirstName_reinsuranceCostReport;
+	public void setShowPatientName_reinsuranceCostReport(boolean showPatientName_reinsuranceCostReport) {
+		this.showPatientName_reinsuranceCostReport = showPatientName_reinsuranceCostReport;
 	}
 	public boolean isShowSubscriberID_reinsuranceCostReport() {
 		return showSubscriberID_reinsuranceCostReport;

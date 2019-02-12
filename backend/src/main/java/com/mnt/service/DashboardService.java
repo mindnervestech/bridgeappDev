@@ -11,6 +11,7 @@ import com.mnt.vm.AdmissionsReportExpandFileVM;
 import com.mnt.vm.AdmissionsReportExpandPrintDataVM;
 import com.mnt.vm.AdmissionsReportFileVM;
 import com.mnt.vm.AdmissionsReportPrintDataVM;
+import com.mnt.vm.AdmissionsReportVM;
 import com.mnt.vm.ClaimDetailsVM;
 import com.mnt.vm.DashboardReportsVM;
 import com.mnt.vm.DrugsVM;
@@ -61,6 +62,8 @@ import com.mnt.vm.reports.SettledMonthsReportFileVM;
 import com.mnt.vm.reports.SettledMonthsReportPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPatientPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportFileVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticePrintDataVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportFileVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportFileVM;
 
@@ -186,6 +189,12 @@ public interface DashboardService {
 			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws IOException;
 	public void generateBeneficiariesManagementByClinicExpandReportPDF(
 			BeneficiariesManagementByClinicReportExpandFileVM fileVM, OutputStream outputStream) throws SQLException, IOException, DocumentException;
+	public List<SpecialistComparisonExpandPracticePrintDataVM> getDataForSpecialistComparisonPracticeExpandPrint(
+			SpecialistComparisonExpandPracticeReportFileVM vm);
+	public void generateSpecialistComparisonExpandPracticeReportXLSX(SpecialistComparisonExpandPracticeReportFileVM fileVM,
+			OutputStream outputStream) throws IOException;
+	public void generateSpecialistComparisonExpandPracticeReportPDF(SpecialistComparisonExpandPracticeReportFileVM fileVM,
+			OutputStream outputStream) throws SQLException, IOException, DocumentException;
 	public DashboardReportsVM getReinsuranceCostReportData(ReportVM vm);
 	public List<ReinsuranceCostReportPrintDataVM> getDataForReinsuranceCostReportPrint(ReinsuranceCostReportFileVM vm);
 	public void generateReinsuranceCostReportXLSX(ReinsuranceCostReportFileVM fileVM, OutputStream outputStream) throws IOException;

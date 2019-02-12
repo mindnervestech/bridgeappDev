@@ -4,8 +4,7 @@ public class ReinsuranceCostReportVM {
 
 	public String planName;
 	public String policyPeriod;
-	public String patientLastName;
-	public String patientFirstName;
+	public String patientName;
 	public String subscriberID;
 	public String effectiveDate;
 	public String termedMonth;
@@ -27,17 +26,12 @@ public class ReinsuranceCostReportVM {
 	public void setPolicyPeriod(String policyPeriod) {
 		this.policyPeriod = policyPeriod;
 	}
-	public String getPatientLastName() {
-		return patientLastName;
+
+	public String getPatientName() {
+		return patientName;
 	}
-	public void setPatientLastName(String patientLastName) {
-		this.patientLastName = patientLastName;
-	}
-	public String getPatientFirstName() {
-		return patientFirstName;
-	}
-	public void setPatientFirstName(String patientFirstName) {
-		this.patientFirstName = patientFirstName;
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
 	}
 	public String getSubscriberID() {
 		return subscriberID;

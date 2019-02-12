@@ -16,7 +16,7 @@ public class DuplicateClaimsExpandPrintDataVM {
 	@JsonProperty("Clinic Name")
 	public String clinicName;
 	
-	@JsonProperty("Provider Name")
+	@JsonProperty("PCP Name")
 	public String providerName;
 	
 	@JsonProperty("Betos Cat")

@@ -668,10 +668,10 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				filterColumnName = "planName";
 			}if(filterColumnName.equals("policyPeriod")) {
 				filterColumnName = "";
-			}if(filterColumnName.equals("patientLastName")) {
-				filterColumnName = "last_name";
-			}if(filterColumnName.equals("patientFirstName")) {
-				filterColumnName = "first_name";
+				
+			}if(filterColumnName.equals("patientName")) {
+				filterColumnName = "patientName";
+				
 			}if(filterColumnName.equals("subscriberID")) {
 				filterColumnName = "medicare_id";
 			}if(filterColumnName.equals("effectiveDate")) {
@@ -714,11 +714,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			if(sortColName.equals("policyPeriod"))
 				sortColName = "";
 			
-			if(sortColName.equals("patientLastName"))
-				sortColName = "last_name";
-			
-			if(sortColName.equals("patientFirstName"))
-				sortColName = "first_name";
+			if(sortColName.equals("patientName"))
+				sortColName = "patientName";
 			
 			if(sortColName.equals("subscriberID"))
 				sortColName = "medicare_id";
@@ -794,17 +791,17 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			queryStr = "select C.*, (inst_claims + prof_claims) as total from (\r\n" + 
 					"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\r\n" + 
 					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
-					"select distinct max(dd.plan_name) planName,dd.last_name,dd.first_name,dd.medicare_id,min(dd.eligible_month) as eligibleMonth,dd.birth_date, dd.gender ,min(dd.pcp_name) as pcpName\r\n" + 
+					"select distinct max(dd.plan_name) planName,concat(dd.last_name,' ',dd.first_name) as patientName,dd.medicare_id,min(dd.eligible_month) as eligibleMonth,dd.birth_date, dd.gender ,min(dd.pcp_name) as pcpName\r\n" + 
 					"from demographic_detail dd \r\n" + 
-					conditionStr+filterStr+" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id,dd.gender \r\n" + 
+					conditionStr+filterStr+" group by dd.birth_date,dd.medicare_id,dd.gender,patientName \r\n" + 
 					") A\r\n" + 
 					" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id\r\n" + 
-					"group by A.last_name,A.first_name,A.birth_date, A.eligibleMonth, A.pcpName, A.medicare_id, A.planName, A.gender  \r\n" + 
+					"group by A.birth_date, A.eligibleMonth, A.pcpName, A.medicare_id, A.planName, A.gender, A.patientName  \r\n" + 
 					") B \r\n" + 
 					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
-					"group by B.last_name,B.first_name,B.birth_date, B.eligibleMonth, B.pcpName,B.medicare_id, B.planName, B.gender \r\n" + 
+					"group by B.birth_date, B.eligibleMonth, B.pcpName,B.medicare_id, B.planName, B.gender, B.patientName \r\n" + 
 					") C\r\n" + 
-					" having total > (select reinsurance_cost_threshold from settings_table limit 1)" +havingStr;
+					" having total > (select reinsurance_cost_threshold from settings_table limit 1)" + havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
@@ -968,7 +965,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		for(int i=0;i<filteredList.size();i++) {
 			filterColumnName = filteredList.get(i).getId();
 			if(filterColumnName.equals("patientName")) {
-				filterColumnName = "concat(first_name,last_name)";
+				filterColumnName = "concat(first_name,' ',last_name)";
 			}
 			if(filterColumnName.equals("pcpName")) {
 				filterColumnName = "pcp_name";
@@ -1005,7 +1002,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			
 			sortColName = sortedList.get(0).getId();
 			if(sortColName.equals("patientName"))
-				sortColName = "concat(last_name,first_name)";
+				sortColName = "concat(last_name,' ',first_name)";
 			if(sortColName.equals("pcpName"))
 				sortColName = "pcpName";
 			if(sortColName.equals("pcpLocation"))

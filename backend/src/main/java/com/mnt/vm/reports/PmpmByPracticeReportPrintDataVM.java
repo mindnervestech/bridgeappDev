@@ -7,7 +7,7 @@ public class PmpmByPracticeReportPrintDataVM {
 	@JsonProperty("Facility Location Name")
 	public String facilityLocationName;
 
-	@JsonProperty("Provider Name")
+	@JsonProperty("PCP Name")
 	public String providerName;
 	
 	@JsonProperty("Total Cost")

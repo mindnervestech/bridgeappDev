@@ -85,6 +85,8 @@ import com.mnt.vm.reports.SettledMonthsReportFileVM;
 import com.mnt.vm.reports.SettledMonthsReportPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPatientPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPatientReportFileVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticePrintDataVM;
+import com.mnt.vm.reports.SpecialistComparisonExpandPracticeReportFileVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandPrintDataVM;
 import com.mnt.vm.reports.SpecialistComparisonExpandReportFileVM;
 import com.opencsv.bean.CsvToBean;
@@ -463,6 +465,13 @@ public class DashboardController {
 	@ResponseBody
     public List<SpecialistComparisonExpandPrintDataVM> getSpecialistComparisonExpandReportDataForPrint(SpecialistComparisonExpandReportFileVM vm) {
 		return dashboardService.getDataForSpecialistComparisonExpandPrint(vm);
+    }
+	
+
+	@RequestMapping(value="/getSpecialistComparisonExpandPracticeReportDataForPrint",method = RequestMethod.POST)
+	@ResponseBody
+    public List<SpecialistComparisonExpandPracticePrintDataVM> getSpecialistComparisonExpandPracticeReportDataForPrint(SpecialistComparisonExpandPracticeReportFileVM vm) {
+		return dashboardService.getDataForSpecialistComparisonPracticeExpandPrint(vm);
     }
 	@RequestMapping(value="/getSpecialistComparisonPatientExpandReportDataForPrint",method = RequestMethod.POST)
 	@ResponseBody
@@ -893,6 +902,37 @@ public class DashboardController {
 		}
 		return csv;
 	}
+	
+	
+
+	@RequestMapping(value="/renderSpecialistComparisonExpandPracticeReportXLSX/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderSpecialistComparisonExpandPracticeReportXLSX(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		ObjectMapper mapper = new ObjectMapper();
+		SpecialistComparisonExpandPracticeReportFileVM fileVM = null;
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), SpecialistComparisonExpandPracticeReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Specialist Comparison Expand Practice Report" + ".xlsx\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateSpecialistComparisonExpandPracticeReportXLSX(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	
+
 	@RequestMapping(value="/renderSpecialistComparisonExpandReportPDF/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderSpecialistComparisonExpandReportPDF(@PathVariable String json, HttpServletResponse response) {
@@ -925,7 +965,39 @@ public class DashboardController {
 		return csv;
 	}
 	
-		@RequestMapping(value="/renderSpecialistComparisonPatientExpandReportPDF/{json}",method = RequestMethod.GET)
+	
+	@RequestMapping(value="/renderSpecialistComparisonExpandPracticeReportPDF/{json}",method = RequestMethod.GET)
+	@ResponseBody
+	public String renderSpecialistComparisonExpandPracticeReportPDF(@PathVariable String json, HttpServletResponse response) {
+		String csv = "";
+		ObjectMapper mapper = new ObjectMapper();
+		byte[] decodedBytes = Base64.getDecoder().decode(json);
+		SpecialistComparisonExpandPracticeReportFileVM fileVM = null;
+		
+		try {
+			fileVM = mapper.readValue(new String(decodedBytes), SpecialistComparisonExpandPracticeReportFileVM.class);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export- Specialist Comparison Expand Practice Report" + ".pdf\"");
+		try {
+			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateSpecialistComparisonExpandPracticeReportPDF(fileVM,outputStream);
+			outputStream.close();
+			response.flushBuffer();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+		return csv;
+	}
+	@RequestMapping(value="/renderSpecialistComparisonPatientExpandReportPDF/{json}",method = RequestMethod.GET)
 	@ResponseBody
 	public String renderSpecialistComparisonPatientExpandReportPDF(@PathVariable String json, HttpServletResponse response) {
 		String csv = "";

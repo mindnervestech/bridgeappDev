@@ -13,7 +13,7 @@ public class DuplicateClaimPrintDataVM {
 	@JsonProperty("Patient Name")
 	public String PatientName;
 	
-	@JsonProperty("PCP")
+	@JsonProperty("PCP Name")
 	public String pcp;
 	
 	@JsonProperty("Eligible Month")

@@ -10,11 +10,8 @@ public class ReinsuranceCostReportPrintDataVM {
 	@JsonProperty("Policy Period")
 	public String policyPeriod;
 	
-	@JsonProperty("Patient Last Name")
-	public String patientLastName;
-	
-	@JsonProperty("Patient First Name")
-	public String patientFirstName;
+	@JsonProperty("Patient Name")
+	public String patientName;
 	
 	@JsonProperty("HICN/SubscriberID")
 	public String subscriberID;
@@ -56,20 +53,13 @@ public class ReinsuranceCostReportPrintDataVM {
 		this.policyPeriod = policyPeriod;
 	}
 
-	public String getPatientLastName() {
-		return patientLastName;
+
+	public String getPatientName() {
+		return patientName;
 	}
 
-	public void setPatientLastName(String patientLastName) {
-		this.patientLastName = patientLastName;
-	}
-
-	public String getPatientFirstName() {
-		return patientFirstName;
-	}
-
-	public void setPatientFirstName(String patientFirstName) {
-		this.patientFirstName = patientFirstName;
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
 	}
 
 	public String getSubscriberID() {
@@ -135,6 +125,7 @@ public class ReinsuranceCostReportPrintDataVM {
 	public void setTotalClaimsCost(String totalClaimsCost) {
 		this.totalClaimsCost = totalClaimsCost;
 	}
+
 	
 	
 }
