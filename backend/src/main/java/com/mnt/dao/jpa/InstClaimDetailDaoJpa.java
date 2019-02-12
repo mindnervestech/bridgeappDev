@@ -3776,8 +3776,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		}
 		
 		
-		queryStr = "select provider_name,claim_specialty,member_name,pcp_name,count(distinct claim_id) as noOfClaims,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost from prof_claim_detail \n" + 
-					"where provider_name="+'\''+vm.getPracticeName()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,pcp_name "+havingStr
+		queryStr = "select provider_name,claim_specialty,member_name,pcp_name,count(distinct claim_id) as noOfClaims,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost,medicare_id from prof_claim_detail \n" + 
+					"where provider_name="+'\''+vm.getPracticeName()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,pcp_name,medicare_id "+havingStr
 					;
 		
 		countQueryStr = "select count(*) from \n" + 
@@ -3795,14 +3795,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		noOfPages = totalCount/vm.getPageSize();
 		if(totalCount % vm.getPageSize() > 0)
 			noOfPages++;
-		String fileQuery;
 		
-		if(sortCountQryStr!="") 
-			fileQuery = queryStr+sortCountQryStr;
-		else
-			fileQuery=queryStr+sortQryStr;
-	
-	
+		String fileQuery = queryStr+sortCountQryStr;
 		
 		responseVM.setDataList(queryResult);
 		responseVM.setNoOfPages(noOfPages);
@@ -3811,7 +3805,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		return responseVM;
 	}
 	
-	public ReportResponseVM getSpecialistComparisonExpandPatientReportData(ReportVM vm) {
+		public ReportResponseVM getSpecialistComparisonExpandPatientReportData(ReportVM vm) {
 		ReportResponseVM responseVM = new ReportResponseVM();
 		
 		ObjectMapper mapper = new ObjectMapper();

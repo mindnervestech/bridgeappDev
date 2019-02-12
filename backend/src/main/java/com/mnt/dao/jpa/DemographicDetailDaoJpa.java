@@ -762,7 +762,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\r\n" + 
 					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
 					"select dd.pcp_location_code,\r\n" + 
-					"round(avg(dd.risk_score_partc),2) as mra,\r\n" + 
+					"COALESCE(round(avg(dd.risk_score_partc),2),0) as mra,\r\n" + 
 					"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\r\n" + 
 					"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\r\n" + 
 					"from demographic_detail dd \r\n" + 
@@ -1244,7 +1244,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 					"union\n" + 
-					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1263,7 +1263,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1279,7 +1279,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1295,7 +1295,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and medicare_id="+'\''+vm.getMedicareId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1456,7 +1456,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 					"union\n" + 
-					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
 					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1475,7 +1475,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1491,7 +1491,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1507,7 +1507,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location_code="+'\''+vm.getPcpLocation()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_location_code,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1839,7 +1839,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
-					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
+					"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 					"union\n" + 
 					"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 					"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1858,7 +1858,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1874,7 +1874,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 
@@ -1890,7 +1890,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'PCP CAP' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,pcp_cap as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
-						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,reinsurance_premium as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
+						"select 'N/A' as claim_id,eligible_month as claim_date,'REINSURANCE PREM' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,constant_val as cost,'' as principal_diagnosis from demographic_detail where provider="+'\''+vm.getProvider()+'\''+" and eligible_month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpId()+'\''+"\n" + 
 						"union\n" + 
 						"select 'N/A' as claim_id,eligible_month as claim_date,'SPEC CLAIMS' as claim_type,'' as clinic_facility_name,pcp_name,'' as drg_code,'' as betos_cat,\n" + 
 						"behavioral_health+chiropractic_cap+dental_cap+hearing_cap+lab+vision_ophthamalogy+vision_optometry+otc_cap+gym_cap+podiatry_cap+transportation\n" + 

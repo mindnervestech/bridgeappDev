@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.itextpdf.text.DocumentException;
+import com.mnt.vm.AdmissionHeaderReportFileVM;
 import com.mnt.vm.AdmissionsReportExpandFileVM;
 import com.mnt.vm.AdmissionsReportExpandPrintDataVM;
 import com.mnt.vm.AdmissionsReportFileVM;
@@ -198,8 +199,6 @@ public interface DashboardService {
 			OutputStream outputStream) throws SQLException, IOException, DocumentException;
 	public void generateSpecialistComparisonExpandPatientReportXLSX(SpecialistComparisonExpandPatientReportFileVM fileVM,
 			OutputStream outputStream) throws IOException;
-
-
 
 
 }

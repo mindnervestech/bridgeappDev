@@ -230,7 +230,7 @@ public class DashboardReportsVM {
 	public void setBeneficiariesManagementByLocationData(
 			List<BeneficiariesManagementByLocationReportVM> beneficiariesManagementBtLocationData) {
 		BeneficiariesManagementByLocationData = beneficiariesManagementBtLocationData;
-	
+	}
 	
 	public List<SpecialistComparisonExpandPatientReportVM> getSpecialistComparisonExpandPatientReportData() {
 		return specialistComparisonExpandPatientReportData;

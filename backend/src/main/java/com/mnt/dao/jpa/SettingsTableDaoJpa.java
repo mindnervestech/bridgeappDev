@@ -39,9 +39,23 @@ public class SettingsTableDaoJpa extends BaseDaoJpa<SettingsTable> implements Se
 	
 	@Override
 	@Transactional
-	public String getMaintenanceMode() {
+	public void setReinsuranceThreshold(Integer reinsuranceThreshold) {
+		Query query = getEntityManager().createNativeQuery("update settings_table set reinsurance_threshold="+'\''+reinsuranceThreshold+'\'');
+        query.executeUpdate();
+	}
+	
+	@Override
+	@Transactional
+	public void setReinsuranceCostThreshold(Integer reinsuranceCostThreshold) {
+		Query query = getEntityManager().createNativeQuery("update settings_table set reinsurance_cost_threshold="+'\''+reinsuranceCostThreshold+'\'');
+        query.executeUpdate();
+	}
+	
+	@Override
+	@Transactional
+	public List<Object[]> getMaintenanceMode() {
 		Query query = getEntityManager().createNativeQuery("select * from settings_table");
-        return query.getSingleResult().toString();
+        return query.getResultList();
 	}
 	
 	@Override

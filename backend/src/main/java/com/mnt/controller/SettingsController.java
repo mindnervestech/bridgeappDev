@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mnt.service.SettingsService;
+import com.mnt.vm.SettingsVM;
 
 @RestController
 public class SettingsController {
@@ -23,8 +24,20 @@ public class SettingsController {
 	
 	@RequestMapping(value="/getMaintenanceMode",method = RequestMethod.GET)
 	@ResponseBody
-    public String getAllPlanAndPCP() {
+    public SettingsVM getAllPlanAndPCP() {
 		return settingsService.getMaintenanceMode();
+    }
+	
+	@RequestMapping(value="/setReinsuranceThreshold",method = RequestMethod.POST)
+	@ResponseBody
+    public void setReinsuranceThreshold(@RequestParam(value="reinsuranceThreshold") Integer reinsuranceThreshold) {
+		settingsService.setReinsuranceThreshold(reinsuranceThreshold);
+    }
+	
+	@RequestMapping(value="/setReinsuranceCostThreshold",method = RequestMethod.POST)
+	@ResponseBody
+    public void setReinsuranceCostThreshold(@RequestParam(value="reinsuranceCostThreshold") Integer reinsuranceCostThreshold) {
+		settingsService.setReinsuranceCostThreshold(reinsuranceCostThreshold);
     }
 	
 	@RequestMapping(value="/deleteAllData",method = RequestMethod.POST)
@@ -36,7 +49,7 @@ public class SettingsController {
 	@RequestMapping(value="/uploadData",method = RequestMethod.POST)
 	@ResponseBody
     public void uploadData() {
-		//settingsService.uploadData();
+		settingsService.uploadData();
     }
 	
 }

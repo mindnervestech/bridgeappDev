@@ -2,6 +2,7 @@ package com.mnt.service.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -2070,8 +2071,8 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPcpLocation(obj[0].toString());
 			if(obj[1] != null)
 				dataVM.setMra(obj[1].toString());
-			if(obj[2] != null) {
-				dataVM.setTotalCost("$"+formatter.format(Double.parseDouble(obj[2].toString())));
+			if(obj[8] != null) {
+				dataVM.setTotalCost("$"+formatter.format(Double.parseDouble(obj[8].toString())));
 			}			
 			list.add(dataVM);
 		}

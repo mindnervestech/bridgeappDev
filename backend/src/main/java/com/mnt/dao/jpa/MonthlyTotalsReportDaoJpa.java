@@ -621,7 +621,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 					") B \r\n" + 
 					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
 					"group by B.eligibleMonth, B.pcpName, B.medicare_id,B.memberName \r\n" + 
-					") C having total > 10000 "+havingStr;
+					") C having total > (select reinsurance_threshold from settings_table limit 1) "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
@@ -710,19 +710,37 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			sortColName = sortedList.get(0).getId();
 			if(sortColName.equals("planName"))
 				sortColName = "planName";
+			
+			if(sortColName.equals("policyPeriod"))
+				sortColName = "";
+			
 			if(sortColName.equals("patientLastName"))
 				sortColName = "last_name";
+			
 			if(sortColName.equals("patientFirstName"))
 				sortColName = "first_name";
+			
 			if(sortColName.equals("subscriberID"))
 				sortColName = "medicare_id";
+			
 			if(sortColName.equals("effectiveDate"))
 				sortColName = "eligibleMonth";
+			
+			if(sortColName.equals("termedMonth"))
+				sortColName = "";
+			
 			if(sortColName.equals("dob"))
-					sortColName="birth_date";
+				sortColName="birth_date";
+			
+			if(sortColName.equals("status"))
+				sortColName = "";
+			
 			if(sortColName.equals("gender"))
 				sortColName="gender";
 		
+			if(sortColName.equals("pcpName"))
+				sortColName = "pcpName";
+			
 			if(sortColName.equals("totalClaimsCost"))
 				sortColName = "total";
 			
@@ -761,7 +779,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			else 
 				conditionStr = conditionStr + " and pcp_name="+'\''+vm.getPcpName()+'\'';
 		}
-		System.out.println(vm.getYear());
+		
 		if(!vm.getYear().equals("all")) {
 			conditionStr = conditionStr + " and eligible_month like "+'\''+vm.getYear()+"%"+'\'';
 		}
@@ -778,15 +796,15 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 					"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
 					"select distinct max(dd.plan_name) planName,dd.last_name,dd.first_name,dd.medicare_id,min(dd.eligible_month) as eligibleMonth,dd.birth_date, dd.gender ,min(dd.pcp_name) as pcpName\r\n" + 
 					"from demographic_detail dd \r\n" + 
-					conditionStr+filterStr+" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id \r\n" + 
+					conditionStr+filterStr+" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id,dd.gender \r\n" + 
 					") A\r\n" + 
 					" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id\r\n" + 
-					"group by A.last_name,A.first_name,A.birth_date, A.eligibleMonth, A.pcpName, A.medicare_id order by A.last_name\r\n" + 
+					"group by A.last_name,A.first_name,A.birth_date, A.eligibleMonth, A.pcpName, A.medicare_id, A.planName, A.gender  \r\n" + 
 					") B \r\n" + 
 					"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
-					"group by B.last_name,B.first_name,B.birth_date, B.eligibleMonth, B.pcpName,B.medicare_id order by B.last_name\r\n" + 
+					"group by B.last_name,B.first_name,B.birth_date, B.eligibleMonth, B.pcpName,B.medicare_id, B.planName, B.gender \r\n" + 
 					") C\r\n" + 
-					" having total>50000" +havingStr;
+					" having total > (select reinsurance_cost_threshold from settings_table limit 1)" +havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;
@@ -903,7 +921,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		
 			if(!filterStr.equals("") && conditionStr.equals(""))
 				filterStr = " where "+filterStr.substring(4);
-			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy,round(sum(total_premium),2) as totalPremium,round(sum(ipa_premium),2) as ipaPremium,round(sum(total_premium-ipa_premium),2) as diff from (\n"+
+			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy,round(sum(total_premium),2) as totalPremium,round(sum(ipa_premium),2) as ipaPremium,round(sum(total_premium-ipa_premium),2) as difference from (\n"+
 					"select pcp_name,round(sum(total_expenses)+constant_val*sum(membership),0) as totalCost,sum(membership) as totalNumberOfMemberMonth,\n" + 
 					"round((sum(total_expenses)+constant_val*sum(membership))/sum(membership),0) as pmpm,\n" + 
 					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id,sum(ipa_premium) as ipa_premium,sum(total_premium) as total_premium from monthly_totals_data \n" + 
@@ -1038,20 +1056,20 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				"select B.*, COALESCE(round(sum(pcd.paid_amount),2),0) as prof_claims from (\r\n" + 
 				"select A.*, COALESCE(round(sum(icd.paid_amount),2),0) as inst_claims from (\r\n" + 
 				"select distinct dd.last_name,dd.first_name,min(dd.pcp_name) as pcpName,min(dd.pcp_location_code) as pcpLocation,\r\n" + 
-				"IFNULL(max(round(dd.risk_score_partc,2)),0) as mra,dd.medicare_id,\r\n" + 
+				"COALESCE(max(round(dd.risk_score_partc,2)),0) as mra,dd.medicare_id,\r\n" + 
 				"COALESCE(round(sum(behavioral_health + chiropractic_cap + dental_cap + hearing_cap + lab + vision_ophthamalogy + vision_optometry + otc_cap + gym_cap + podiatry_cap + transportation + dermatology),2),0) as spec_cost,\r\n" + 
 				"COALESCE(round(sum(pcp_cap),2),0) as pcp_cap, COALESCE(round(count(*)*min(constant_val),2),0) as reinsurance_prem\r\n" + 
 				"from demographic_detail dd where dd.pcp_name = '" +vm.getPcpName() +"' "+ conditionStr+filterStr+
 				" group by dd.last_name,dd.first_name,dd.birth_date,dd.medicare_id \r\n" + 
 				") A\r\n" + 
 				" left join inst_claim_detail icd on icd.medicare_id = A.medicare_id\r\n" + 
-				"group by A.last_name,A.first_name,A.pcpName, A.pcpLocation, A.mra, A.medicare_id order by A.last_name\r\n" + 
+				"group by A.last_name,A.first_name,A.pcpName, A.pcpLocation, A.mra, A.medicare_id, A.spec_cost, A.pcp_cap, A.reinsurance_prem order by A.last_name\r\n" + 
 				") B \r\n" + 
 				"left join prof_claim_detail pcd on pcd.medicare_id = B.medicare_id\r\n" + 
-				"group by B.last_name,B.first_name, B.pcpName, B.pcpLocation, B.mra, B.medicare_id order by B.last_name\r\n" + 
+				"group by B.last_name,B.first_name, B.pcpName, B.pcpLocation, B.mra, B.medicare_id, B.spec_cost, B.pcp_cap, B.reinsurance_prem order by B.last_name\r\n" + 
 				") C \r\n" + 
 				"left join rx_detail rd  on rd.medicare_id = C.medicare_id \r\n" + 
-				"group by C.last_name,C.first_name, C.pcpName, C.pcpLocation, C.mra, C.medicare_id order by C.last_name\r\n" + 
+				"group by C.last_name,C.first_name, C.pcpName, C.pcpLocation, C.mra, C.medicare_id, C.spec_cost, C.pcp_cap, C.reinsurance_prem order by C.last_name\r\n" + 
 				")  D \r\n" + 
 				"\r\n" +havingStr ;
 				
