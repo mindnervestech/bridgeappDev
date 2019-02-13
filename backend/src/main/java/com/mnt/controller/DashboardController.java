@@ -1370,6 +1370,7 @@ public class DashboardController {
 	    response.setHeader("Content-Disposition", "attachment; filename=\"" + "Data export-Reinsurance Management Report" + ".xlsx\"");
 		try {
 			OutputStream outputStream = response.getOutputStream();
+			dashboardService.generateReinsuranceManagementReportXLSX(fileVM, outputStream);
 			outputStream.close();
 			response.flushBuffer();
 		} catch (IOException e) {

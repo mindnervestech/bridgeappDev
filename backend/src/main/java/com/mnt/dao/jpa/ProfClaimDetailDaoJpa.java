@@ -147,7 +147,7 @@ public class ProfClaimDetailDaoJpa extends BaseDaoJpa<ProfClaimDetail> implement
 				sortColName = "pcp_location_code";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
-				sortColName = "cost";
+				sortColName = "round(cost,0)";
 			}
 			if(sortedList.get(0).getId().equals("claimType")) {
 				sortColName = "claim_type";

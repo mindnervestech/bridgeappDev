@@ -197,47 +197,52 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				filterColumnName = "membership";
 			}
 			if(filteredList.get(i).getId().equals("maPremium")) {
-				filterColumnName = "premium_ma";
+				filterColumnName = "round(premium_ma,0)";
 			}
 			if(filteredList.get(i).getId().equals("partDPremium")) {
-				filterColumnName = "premium_partd";
+				filterColumnName = "round(premium_partd,0)";
 			}
 			if(filteredList.get(i).getId().equals("totalPremium")) {
-				filterColumnName = "total_premium";
+				filterColumnName = "round(total_premium,0)";
 			}
 			if(filteredList.get(i).getId().equals("ipaPremium")) {
-				filterColumnName = "ipa_premium";
+				filterColumnName = "round(ipa_premium,0)";
 			}
 			if(filteredList.get(i).getId().equals("pcpCap")) {
 				filterColumnName = "pcp_cap";
 			}
 			if(filteredList.get(i).getId().equals("specCost")) {
-				filterColumnName = "spec_cost";
+				filterColumnName = "round(spec_cost,0)";
 			}
 			if(filteredList.get(i).getId().equals("profClaims")) {
-				filterColumnName = "prof_claims";
+				filterColumnName = "round(prof_claims,0)";
 			}
 			if(filteredList.get(i).getId().equals("instClaims")) {
-				filterColumnName = "inst_claims";
+				filterColumnName = "round(inst_claims,0)";
 			}
 			if(filteredList.get(i).getId().equals("rxClaims")) {
-				filterColumnName = "rx_claims";
+				filterColumnName = "round(rx_claims,0)";
 			}
 			if(filteredList.get(i).getId().equals("ibnrDollars")) {
-				filterColumnName = "ibnr_dollars";
+				filterColumnName = "round(ibnr_dollars,0)";
 			}
 			if(filteredList.get(i).getId().equals("reinsurancePremium")) {
-				filterColumnName = "reinsurance";
+				filterColumnName = "reinsurancePremium";
 			}
 			if(filteredList.get(i).getId().equals("totalExpenses")) {
-				filterColumnName = "total_expenses";
+				filterColumnName = "round(totalExpenses,0)";
 			}
-			
-				if(!filterColumnName.equals("")) {
+				
+				if(!filterColumnName.equals("") && !filterColumnName.equals("round(totalExpenses,0)") && !filterColumnName.equals("reinsurancePremium")) {
 					filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
 				}
+				if(filterColumnName.equals("round(totalExpenses,0)")||filterColumnName.equals("reinsurancePremium"))
+					havingStr += " and "+filterColumnName +" like '%"+filteredList.get(i).getValue()+"%'"+" "; 
 				
 		}
+		
+		if(!havingStr.equals(""))
+			havingStr= " having "+havingStr.substring(4);
 		
 		String sortStr = "";
 		String sortColName = "";
@@ -252,7 +257,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				sortColName = "premium_ma";
 			}
 			if(sortedList.get(0).getId().equals("partDPremium")) {
-				sortColName = "premium_partd";
+				sortColName = "round(premium_partd,0)";
 			}
 			if(sortedList.get(0).getId().equals("totalPremium")) {
 				sortColName = "total_premium";
@@ -261,44 +266,39 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				sortColName = "ipa_premium";
 			}
 			if(sortedList.get(0).getId().equals("pcpCap")) {
-				sortColName = "pcp_cap";
+				sortColName = "round(pcp_cap,0)";
 			}
 			if(sortedList.get(0).getId().equals("specCost")) {
-				sortColName = "spec_cost";
+				sortColName = "round(spec_cost,0)";
 			}
 			if(sortedList.get(0).getId().equals("profClaims")) {
 				sortColName = "prof_claims";
 			}
 			if(sortedList.get(0).getId().equals("instClaims")) {
-				sortColName = "inst_claims";
+				sortColName = "round(inst_claims,0)";
 			}
 			if(sortedList.get(0).getId().equals("rxClaims")) {
 				sortColName = "rx_claims";
 			}
 			if(sortedList.get(0).getId().equals("ibnrDollars")) {
-				sortColName = "ibnr_dollars";
+				sortColName = "round(ibnr_dollars,0)";
 			}
 			if(sortedList.get(0).getId().equals("reinsurancePremium")) {
-				sortColName = "reinsurance";
+				sortColName = "reinsurancePremium";
 			}
 			if(sortedList.get(0).getId().equals("totalExpenses")) {
-				sortColName = "total_expenses";
+				sortColName = "totalExpenses";
 			}
 			
 			
-			if(!sortedList.get(0).getId().equals("month")) {
+			if(!sortedList.get(0).getId().equals("")) {
 				sortStr+= " "+sortColName+" ";
 				if(sortedList.get(0).isDesc()) {
 					sortStr += "desc";
 				} else {
 					sortStr += "asc";
 				}
-			} else {
-				if(!sortedList.get(0).isDesc()) {
-					sortStr+= " "+sortColName+" ";
-					sortStr += "asc";
-				}
-			}
+			} 
 		}
 		
 		List<Object[]> queryResult = new ArrayList<>();
@@ -321,8 +321,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			if(!filterStr.equals(""))
 				filterStr = " where "+filterStr.substring(4);
 			queryStr = "select month,sum(membership),sum(premium_ma),sum(premium_partd),sum(total_premium),sum(ipa_premium),sum(pcp_cap),sum(spec_cost),sum(prof_claims),\n" + 
-					"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership)\n" + 
-					" from monthly_totals_report "+filterStr+" group by month";
+					"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership) as totalExpenses\n" + 
+					" from monthly_totals_report "+filterStr+havingStr+" group by month";
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + 
@@ -330,8 +330,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		} else {
 			if(vm.getProvider().equals("all")) {
 				queryStr = "select month,sum(membership),sum(premium_ma),sum(premium_partd),sum(total_premium),sum(ipa_premium),sum(pcp_cap),sum(spec_cost),sum(prof_claims),\n" + 
-						"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership)\n" + 
-						" from monthly_totals_report where year="+'\''+vm.getYear()+'\''+" "+filterStr+" group by month";
+						"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership) as totalExpenses\n" + 
+						" from monthly_totals_report where year="+'\''+vm.getYear()+'\''+" "+filterStr+havingStr+" group by month";
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 
@@ -339,8 +339,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			}
 			if(vm.getYear().equals("all")) {
 				queryStr = "select month,sum(membership),sum(premium_ma),sum(premium_partd),sum(total_premium),sum(ipa_premium),sum(pcp_cap),sum(spec_cost),sum(prof_claims),\n" + 
-						"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership)\n" + 
-						" from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" "+filterStr+" group by month";
+						"sum(inst_claims),sum(rx_claims),sum(ibnr_dollars),sum(round(membership*reinsurance,0)) as reinsurancePremium,sum(total_expenses+reinsurance*membership) as totalExpenses\n" + 
+						" from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" "+filterStr+havingStr+" group by month";
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 
@@ -348,8 +348,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			}
 			if(!vm.getProvider().equals("all") && !vm.getYear().equals("all")) {
 				queryStr = "select month,membership,premium_ma,premium_partd,total_premium,ipa_premium,pcp_cap,spec_cost,prof_claims,\n" + 
-						"inst_claims,rx_claims,ibnr_dollars,round(membership*reinsurance,0) as reinsurancePremium,total_expenses+reinsurance*membership"+ 
-						" from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" and year="+'\''+vm.getYear()+'\''+filterStr;
+						"inst_claims,rx_claims,ibnr_dollars,round(membership*reinsurance,0) as reinsurancePremium,total_expenses+reinsurance*membership as totalExpenses"+ 
+						" from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" and year="+'\''+vm.getYear()+'\''+filterStr+havingStr;
 				
 				countQueryStr = "select count(*) from \n" + 
 						"(\n" + 
@@ -357,12 +357,13 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				
 			}
 		}
+		System.out.println(queryStr+sortQryStr);
+		System.out.println(countQueryStr+sortCountQryStr);
 		
 		Query query = getEntityManager().createNativeQuery(queryStr+sortQryStr);
 		queryResult = query.getResultList();
 		
-		System.out.println(queryStr+sortQryStr);
-		System.out.println(countQueryStr+sortCountQryStr);
+	
 		Query countQuery = getEntityManager().createNativeQuery(countQueryStr+sortCountQryStr+" ) A");
 		totalCount = Integer.parseInt(countQuery.getSingleResult().toString());
 		noOfPages = totalCount/vm.getPageSize();
@@ -848,6 +849,16 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			if(filterColumnName.equals("facilityLocationName")) {
 				filterColumnName = "";
 			}
+			if(filterColumnName.equals("totalPremium")) {
+				filterColumnName = "round(totalExpenses,0)";
+			}
+
+			if(filterColumnName.equals("difference"))
+				filterColumnName = "round(difference,0)";
+			
+			if(filterColumnName.equals("ipaPremium"))
+				filterColumnName = "round(ipaPremium,0)";
+			
 			if(filterColumnName.equals("providerName")) {
 				filterColumnName = "pcp_name";
 			}
@@ -874,6 +885,8 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				sortColName = "";
 			if(sortColName.equals("providerName"))
 				sortColName = "pcp_name";
+			if(sortColName.equals("totalPremium"))
+				sortColName = "totalExpenses";
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
 				if(sortedList.get(0).isDesc()) {
@@ -918,11 +931,11 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		
 			if(!filterStr.equals("") && conditionStr.equals(""))
 				filterStr = " where "+filterStr.substring(4);
-			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy,round(sum(total_premium),2) as totalPremium,round(sum(ipa_premium),2) as ipaPremium,round(sum(total_premium-ipa_premium),2) as difference from (\n"+
+			queryStr = "select pcp_name,sum(totalCost) as totalCost,sum(totalNumberOfMemberMonth) as totalNumberOfMemberMonth,sum(pmpm) as pmpm,sum(pmpy) as pmpy,round(sum(totalExp),2) as totalExpenses,round(sum(ipa_premium),2) as ipaPremium,round(sum(totalExp-ipa_premium),2) as difference,mra from (\n"+
 					"select pcp_name,round(sum(total_expenses)+constant_val*sum(membership),0) as totalCost,sum(membership) as totalNumberOfMemberMonth,\n" + 
 					"round((sum(total_expenses)+constant_val*sum(membership))/sum(membership),0) as pmpm,\n" + 
-					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id,sum(ipa_premium) as ipa_premium,sum(total_premium) as total_premium from monthly_totals_data \n" + 
-					conditionStr+" "+filterStr+" group by pcp_name,constant_val,pcp_id) A group by pcp_name "+havingStr;
+					"round(((sum(total_expenses)+constant_val*sum(membership))/sum(membership))*12,0) as pmpy,pcp_id,sum(ipa_premium) as ipa_premium,sum(total_expenses) as totalExp,COALESCE(max(round(risk_score_partc,2)),0) as mra from monthly_totals_data \n" + 
+					conditionStr+" "+filterStr+" group by pcp_name,constant_val,pcp_id) A group by pcp_name,mra "+havingStr;
 			
 			countQueryStr = "select count(*) from \n" + 
 					"(\n" + queryStr;

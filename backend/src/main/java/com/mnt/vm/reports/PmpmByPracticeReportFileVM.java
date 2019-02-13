@@ -5,6 +5,7 @@ public class PmpmByPracticeReportFileVM {
 	public String fileQuery;
 	public boolean showFacilityLocationName_pmpmByPractice;
 	public boolean showProviderName_pmpmByPractice;
+	public boolean showMra_pmpmByPractice;
 	public boolean showTotalCost_pmpmByPractice;
 	public boolean showTotalNumberOfMemberMonth_pmpmByPractice;
 	public boolean showPMPM_pmpmByPractice;
@@ -72,5 +73,11 @@ public class PmpmByPracticeReportFileVM {
 	}
 	public void setShowTotalPremium_pmpmByPractice(boolean showTotalPremium_pmpmByPractice) {
 		this.showTotalPremium_pmpmByPractice = showTotalPremium_pmpmByPractice;
+	}
+	public boolean isShowMra_pmpmByPractice() {
+		return showMra_pmpmByPractice;
+	}
+	public void setShowMra_pmpmByPractice(boolean showMra_pmpmByPractice) {
+		this.showMra_pmpmByPractice = showMra_pmpmByPractice;
 	}
 }

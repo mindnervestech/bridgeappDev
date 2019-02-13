@@ -3443,6 +3443,9 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 			if(sortedList.get(0).getId().equals("numberOfClaims")) {
 				sortColName = "noOfClaims";
 			}
+			if(sortedList.get(0).getId().equals("numberOfPcp")) {
+				sortColName = "noOfPcp";
+			}
 			if(sortedList.get(0).getId().equals("numberOfBeneficiaries")) {
 				sortColName = "noOfBenef";
 			}
@@ -3633,8 +3636,8 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		
 		queryStr ="select provider_name,claim_specialty,sum(noOfClaims) as noOfClaims,round(sum(cost)/sum(noOfClaims),2) as avgCost,sum(cost) as cost from ("+ 
 				"select provider_name,claim_specialty,count(distinct claim_id) as noOfClaims,member_name,round(round(sum(paid_amount),2)/count(distinct claim_id),2) as avgCost,round(sum(paid_amount),2) as cost from prof_claim_detail \n" + 
-					"where claim_specialty="+'\''+vm.getSpeciality()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,provider_name "+havingStr
-					+"\n ) A group by provider_name ";
+					"where claim_specialty="+'\''+vm.getSpeciality()+'\''+conditionStr+" "+filterStr+" group by provider_name,claim_specialty,member_name,provider_name "
+					+"\n ) A group by provider_name "+havingStr;
 		
 		countQueryStr = "select count(*) from \n" + 
 				"(\n" + 

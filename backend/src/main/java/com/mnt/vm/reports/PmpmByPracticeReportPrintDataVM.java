@@ -10,6 +10,9 @@ public class PmpmByPracticeReportPrintDataVM {
 	@JsonProperty("PCP Name")
 	public String providerName;
 	
+	@JsonProperty("MRA")
+	public String mra;
+	
 	@JsonProperty("Total Cost")
 	public String totalCost;
 	
@@ -22,13 +25,13 @@ public class PmpmByPracticeReportPrintDataVM {
 	@JsonProperty("PMPY")
 	public String pmpy;
 	
-	@JsonProperty("Total Premium")
+	@JsonProperty("Total Expenses")
 	public String totalPremium;
 	
 	@JsonProperty("IPA Premium")
 	public String ipaPremium;
 	
-	@JsonProperty("Total Premium - IPA Premium")
+	@JsonProperty("Total Expenses - IPA Premium")
 	public String difference;
 
 	public String getFacilityLocationName() {
@@ -101,5 +104,13 @@ public class PmpmByPracticeReportPrintDataVM {
 
 	public void setDifference(String difference) {
 		this.difference = difference;
+	}
+
+	public String getMra() {
+		return mra;
+	}
+
+	public void setMra(String mra) {
+		this.mra = mra;
 	}
 }

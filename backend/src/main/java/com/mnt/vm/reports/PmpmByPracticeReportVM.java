@@ -5,6 +5,7 @@ public class PmpmByPracticeReportVM {
 	public String facilityLocationName;
 	public String providerName;
 	public String pcpId;
+	public String mra;
 	public String totalCost;
 	public String totalNumberOfMemberMonth;
 	public String pmpm;
@@ -72,5 +73,11 @@ public class PmpmByPracticeReportVM {
 	}
 	public void setDifference(String difference) {
 		this.difference = difference;
+	}
+	public String getMra() {
+		return mra;
+	}
+	public void setMra(String mra) {
+		this.mra = mra;
 	}
 }

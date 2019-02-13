@@ -846,6 +846,8 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setIpaPremium("$"+formatter.format(Double.parseDouble(obj[6].toString())));
 			if(obj[7] != null)
 				dataVM.setDifference("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setMra(obj[8].toString());
 			
 			list.add(dataVM);
 		}
@@ -2005,6 +2007,8 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setIpaPremium("$"+formatter.format(Double.parseDouble(obj[6].toString())));
 			if(obj[7] != null)
 				dataVM.setDifference("$"+formatter.format(Double.parseDouble(obj[7].toString())));
+			if(obj[8] != null)
+				dataVM.setMra(obj[8].toString());
 			
 			list.add(dataVM);
 		}
@@ -2410,6 +2414,8 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setDrgCode(obj[5].toString());
 			if(obj[6] != null)
 				dataVM.setBetosCat(obj[6].toString());
+			else
+				dataVM.setBetosCat("");
 			if(obj[7] != null)
 				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			dataVM.setIcdCodes("");
@@ -2557,10 +2563,10 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setSpecialityType(obj[1].toString());
 			if(obj[2] != null)
 				dataVM.setNumberOfClaims(obj[2].toString());
+			if(obj[3] != null)
+				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[3].toString())));
 			if(obj[4] != null)
-				dataVM.setAverageCostPerClaim("$"+formatter.format(Double.parseDouble(obj[4].toString())));
-			if(obj[5] != null)
-				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[5].toString())));
+				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[4].toString())));
 			list.add(dataVM);
 		}
 		
@@ -2603,6 +2609,14 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setReinsurancePremium("$"+formatter.format(Double.parseDouble(obj[12].toString())));
 			if(obj[13] != null)
 				dataVM.setTotalExpenses("$"+formatter.format(Double.parseDouble(obj[13].toString())));
+			
+			dataVM.setSpecCap("$0");
+			dataVM.setReinsuranceRecovered("$0");
+			dataVM.setRxAdmin("$0");
+			dataVM.setSilverSneakerUtilization("$0");
+			dataVM.setPba("$0");
+			dataVM.setHumanaAtHome("$0");
+			dataVM.setDentalFFS("$0");
 			
 			list.add(dataVM);
 		}
@@ -4736,6 +4750,8 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 	        	tableColumnSize++;
 	        if(fileVM.showProviderName_pmpmByPractice)
 	        	tableColumnSize++;
+	        if(fileVM.showMra_pmpmByPractice)
+	        	tableColumnSize++;
 	        if(fileVM.showTotalCost_pmpmByPractice)
 	        	tableColumnSize++;
 	        if(fileVM.showTotalNumberOfMemberMonth_pmpmByPractice)
@@ -4775,6 +4791,15 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 		        cell1.setBorderWidth(0.1f);
 		        table.addCell(cell1);
 	        }
+	        if(fileVM.showMra_pmpmByPractice) {
+	        	PdfPCell cell4 = new PdfPCell(new Paragraph("MRA", font));
+	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+		        cell4.setVerticalAlignment(Element.ALIGN_TOP);
+		        cell4.setBackgroundColor(myColor);
+		        cell4.setBorderColor(BaseColor.WHITE);
+		        cell4.setBorderWidth(0.1f);
+	        	table.addCell(cell4);
+	        }
 	        if(fileVM.showTotalCost_pmpmByPractice) {
 	        	PdfPCell cell4 = new PdfPCell(new Paragraph("Total Cost", font));
 	        	cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -4812,7 +4837,7 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 	        	table.addCell(cell7);
 	        }
 	        if(fileVM.showTotalPremium_pmpmByPractice) {
-	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Premium", font));
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Expenses", font));
 	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
 		        cell7.setBackgroundColor(myColor);
@@ -4830,7 +4855,7 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 	        	table.addCell(cell7);
 	        }
 	        if(fileVM.showDifference_pmpmByPractice) {
-	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Premium - IPA Premium", font));
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Total Expenses - IPA Premium", font));
 	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
 		        cell7.setBackgroundColor(myColor);
@@ -4866,6 +4891,16 @@ public void generateCostManagementReportPDF(ReinsuranceCostReportFileVM fileVM, 
 			        rowCell1.setBorderWidth(0.1f);
 			        table.addCell(rowCell1);
 	        	}
+	        	if(fileVM.showMra_pmpmByPractice) {
+		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getMra(), rowFont));
+			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
+			        rowCell4.setVerticalAlignment(Element.ALIGN_TOP);
+			        if(count%2 > 0)
+			        rowCell4.setBackgroundColor(oddRowColor);
+			        rowCell4.setBorderColor(BaseColor.WHITE);
+			        rowCell4.setBorderWidth(0.1f);
+			        table.addCell(rowCell4);
+		        }
 		        if(fileVM.showTotalCost_pmpmByPractice) {
 		        	PdfPCell rowCell4 = new PdfPCell(new Paragraph(vm.getTotalCost(), rowFont));
 			        rowCell4.setHorizontalAlignment(Element.ALIGN_LEFT);
@@ -9941,6 +9976,12 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      cell0.setCellStyle(headerCellStyle);
 	    }
 	      
+	    if(fileVM.showMra_pmpmByPractice) {
+	    	  Cell cell1 = headerRow.createCell(++headerIndex);
+	    	  cell1.setCellValue("MRA");
+	    	  cell1.setCellStyle(headerCellStyle);
+	      }
+	    
 	      if(fileVM.showTotalCost_pmpmByPractice) {
 	    	  Cell cell1 = headerRow.createCell(++headerIndex);
 	    	  cell1.setCellValue("Total Cost");
@@ -9967,7 +10008,7 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      
 	      if(fileVM.showTotalPremium_pmpmByPractice) {
 	    	  Cell cell1 = headerRow.createCell(++headerIndex);
-	    	  cell1.setCellValue("Total Premium");
+	    	  cell1.setCellValue("Total Expenses");
 	    	  cell1.setCellStyle(headerCellStyle);
 	      }
 	      
@@ -9979,7 +10020,7 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      
 	      if(fileVM.showDifference_pmpmByPractice) {
 	    	  Cell cell1 = headerRow.createCell(++headerIndex);
-	    	  cell1.setCellValue("Total Premium - IPA Premium");
+	    	  cell1.setCellValue("Total Expenses - IPA Premium");
 	    	  cell1.setCellStyle(headerCellStyle);
 	      }
 	      
@@ -9999,6 +10040,10 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	          	  row.createCell(++rowIndex).setCellValue(vm.getProviderName());
 	    	  }
 		    
+	    	  if(fileVM.showMra_pmpmByPractice) {
+		    	  row.createCell(++rowIndex).setCellValue(vm.getMra());
+		      }
+	    	  
 		      if(fileVM.showTotalCost_pmpmByPractice) {
 		    	  row.createCell(++rowIndex).setCellValue(vm.getTotalCost());
 		      }
