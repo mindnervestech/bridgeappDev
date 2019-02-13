@@ -49,7 +49,7 @@ public class SettingsController {
 	@RequestMapping(value="/uploadData",method = RequestMethod.POST)
 	@ResponseBody
     public void uploadData() {
-		settingsService.uploadData();
+		//settingsService.uploadData();
     }
 	
 }

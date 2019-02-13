@@ -25,54 +25,7 @@ public class MonthlyTotalsDataDaoJpa  extends BaseDaoJpa<MonthlyTotalsData>  imp
 	@Transactional
 	public List<Object[]> getSumOfClaim(String provider, String pcpName, List<OptionsVM> locationList, String year) {
 		String str = "",conditionStr = "";
-		/*if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where year="+'\''+year+'\''+"";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where pcp_location="+'\''+locationName+'\''+"";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where year="+'\''+year+'\''+" and pcp_location="+'\''+locationName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where year="+'\''+year+'\''+" and pcp_name="+'\''+pcpName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\''+" and year="+'\''+year+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and year="+'\''+year+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_location="+'\''+locationName+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_location="+'\''+locationName+'\''+" and year="+'\''+year+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and year="+'\''+year+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(prof_claims),2),round(sum(inst_claims),2),round(sum(rx_claims),2) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\''+" and year="+'\''+year+'\''+"";
-		}*/
+		
 		if(!provider.equals("all")) {
 			conditionStr = conditionStr + " and provider="+'\''+provider+'\'';
 		}
@@ -86,13 +39,13 @@ public class MonthlyTotalsDataDaoJpa  extends BaseDaoJpa<MonthlyTotalsData>  imp
 		if(!locationList.isEmpty()) {
 			for(int i=0;i<locationList.size();i++) {
 					if(!locationList.get(i).getValue().equals("all")) {
-						if(i != locationList.size()-1)
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\''+" or ";
-						else
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\'';
+						locationCondition = locationCondition + " or pcp_location="+'\''+locationList.get(i).getValue()+'\'';
 					}
 				}
 		}
+		
+		if(!locationCondition.equals(""))
+			locationCondition = locationCondition.substring(3);
 		
 		if(!locationCondition.equals(""))
 			conditionStr = conditionStr + " and ("+locationCondition+")";
@@ -115,54 +68,6 @@ public class MonthlyTotalsDataDaoJpa  extends BaseDaoJpa<MonthlyTotalsData>  imp
 	@Transactional
 	public Double getSumOfSpecialistClaim(String provider, String pcpName, List<OptionsVM> locationList, String year) {
 		String str = "",conditionStr = "";
-		/*if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where service_month like "+'\''+year+"%"+'\''+"";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where service_month like "+'\''+year+"%"+'\'';
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where pcp_name="+'\''+pcpName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where service_month like "+'\''+year+"%"+'\''+" and pcp_name="+'\''+pcpName+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where pcp_name="+'\''+pcpName+'\'';
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where pcp_name="+'\''+pcpName+'\''+" and service_month like "+'\''+year+"%"+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and service_month like "+'\''+year+"%"+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and service_month like "+'\''+year+"%"+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and service_month like "+'\''+year+"%"+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select round(sum(paid_amount),2) from specialty_claim_detail where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and service_month like "+'\''+year+"%"+'\''+"";
-		}*/
 		
 		if(!provider.equals("all")) {
 			conditionStr = conditionStr + " and provider="+'\''+provider+'\'';
@@ -245,55 +150,6 @@ public class MonthlyTotalsDataDaoJpa  extends BaseDaoJpa<MonthlyTotalsData>  imp
 			currentMonthStr = year+"/"+12+"%";
 		}
 		
-		/*if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_location="+'\''+locationName+'\''+"";
-		}
-		if(provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_location="+'\''+locationName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_name="+'\''+pcpName+'\'';
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\'';
-		}
-		if(provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where pcp_name="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_location="+'\''+locationName+'\'';
-		}
-		if(!provider.equals("all") && pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_location="+'\''+locationName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\'';
-		}
-		if(!provider.equals("all") && !pcpName.equals("all") && !locationName.equals("all") && !year.equals("all")) {
-			str = "select sum(membership) from monthly_totals_data where provider="+'\''+provider+'\''+" and pcp_id="+'\''+pcpName+'\''+" and pcp_location="+'\''+locationName+'\''+" and month like "+'\''+currentMonthStr+'\''+"";
-		}*/
-		
 		if(!provider.equals("all")) {
 			conditionStr = conditionStr + " and provider="+'\''+provider+'\'';
 		}
@@ -307,13 +163,13 @@ public class MonthlyTotalsDataDaoJpa  extends BaseDaoJpa<MonthlyTotalsData>  imp
 		if(!locationList.isEmpty()) {
 			for(int i=0;i<locationList.size();i++) {
 					if(!locationList.get(i).getValue().equals("all")) {
-						if(i != locationList.size()-1)
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\''+" or ";
-						else
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\'';
+						locationCondition = locationCondition + " or pcp_location="+'\''+locationList.get(i).getValue()+'\'';
 					}
 				}
 		}
+		
+		if(!locationCondition.equals(""))
+			locationCondition = locationCondition.substring(3);
 		
 		if(!locationCondition.equals(""))
 			conditionStr = conditionStr + " and ("+locationCondition+")";

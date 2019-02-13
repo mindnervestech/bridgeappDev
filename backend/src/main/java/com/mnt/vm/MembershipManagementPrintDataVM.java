@@ -19,7 +19,7 @@ public class MembershipManagementPrintDataVM {
 	@JsonProperty("Patient DOB")
 	public String patientDob;
 	
-	@JsonProperty("Assigned PCP")
+	@JsonProperty("PCP Name")
 	public String assignedPcp;
 	
 	@JsonProperty("PCP Location")

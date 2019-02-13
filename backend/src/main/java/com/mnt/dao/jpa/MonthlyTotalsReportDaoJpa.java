@@ -38,96 +38,6 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 	public List<Object[]> getMonthlyTotalsReport(ClaimDetailsVM vm) {
 		String str = "",conditionStr = "";
 		
-		/*if(vm.getProvider().equals("all") && vm.getYear().equals("all")) {
-			str = "select round(sum(ipa_premium),2),round(sum(total_expenses),2),month_number from monthly_totals_report group by month_number order by month_number";
-		} else {
-			if(vm.getProvider().equals("all")) {
-				str = "select round(sum(ipa_premium),2),round(sum(total_expenses),2),month_number from monthly_totals_report where year="+'\''+vm.getYear()+'\''+" group by month_number order by month_number";
-			}
-			if(vm.getYear().equals("all")) {
-				str = "select round(sum(ipa_premium),2),round(sum(total_expenses),2),month_number from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" group by month_number order by month_number";
-			}
-			if(!vm.getProvider().equals("all") && !vm.getYear().equals("all")) {
-				str = "select round(sum(ipa_premium),2),round(sum(total_expenses),2),month_number from monthly_totals_report where provider="+'\''+vm.getProvider()+'\''+" and year="+'\''+vm.getYear()+'\''+" group by month_number order by month_number";
-			}
-		}*/
-		
-		/*if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" group by month order by month";
-		} else {
-			if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-			}
-			if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+" group by month order by month";
-			}
-			if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" group by month order by month";
-			}
-			if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" and provider="+'\''+vm.getProvider()+'\''+" group by month order by month";
-			}
-			if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-			}
-			if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-			}
-			if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all")) {
-				str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-			}
-			
-		}*/
-		
-		/*if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where pcp_name="+'\''+vm.getPcpName()+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where pcp_name="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and pcp_name="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where provider="+'\''+vm.getProvider()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where provider="+'\''+vm.getProvider()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}
-		if(!vm.getProvider().equals("all") && !vm.getPcpName().equals("all") && !vm.getPcpLocation().equals("all") && !vm.getYear().equals("all")) {
-			str="select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data where year="+'\''+vm.getYear()+'\''+" and month like "+'\''+vm.getYear()+"%"+'\''+" and provider="+'\''+vm.getProvider()+'\''+" and pcp_id="+'\''+vm.getPcpName()+'\''+" and pcp_location="+'\''+vm.getPcpLocation()+'\''+" group by month order by month";
-		}*/
-		
 		if(!vm.getProvider().equals("all")) {
 			conditionStr = conditionStr + " and provider="+'\''+vm.getProvider()+'\'';
 		}
@@ -150,13 +60,13 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 		if(!locationList.isEmpty()) {
 			for(int i=0;i<locationList.size();i++) {
 					if(!locationList.get(i).getValue().equals("all")) {
-						if(i != locationList.size()-1)
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\''+" or ";
-						else
-							locationCondition = locationCondition + " pcp_location="+'\''+locationList.get(i).getValue()+'\'';
+						locationCondition = locationCondition + " or pcp_location="+'\''+locationList.get(i).getValue()+'\'';
 					}
 				}
 		}
+		
+		if(!locationCondition.equals(""))
+			locationCondition = locationCondition.substring(3);
 		
 		if(!locationCondition.equals(""))
 			conditionStr = conditionStr + " and ("+locationCondition+")";
@@ -169,7 +79,6 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			conditionStr = " where "+conditionStr.substring(4);
 		
 		str = "select round(sum(ipa_premium),2),round(sum(total_expenses+(membership*constant_val)),2),month from monthly_totals_data "+conditionStr+" group by month order by month";
-		System.out.println("Condition string : ................"+conditionStr);
 		System.out.println(str);
 		Query query = getEntityManager().createNativeQuery(str);
 		return  query.getResultList();
@@ -688,7 +597,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 			}if(filterColumnName.equals("pcpName")) {	
 				filterColumnName="pcpName";
 			}if(filterColumnName.equals("totalClaimsCost")) {	
-				filterColumnName="total";
+				filterColumnName="round(total,0)";
 			}
 				
 			
@@ -740,7 +649,7 @@ public class MonthlyTotalsReportDaoJpa extends BaseDaoJpa<MonthlyTotalsReport> i
 				sortColName = "pcpName";
 			
 			if(sortColName.equals("totalClaimsCost"))
-				sortColName = "total";
+				sortColName = "round(total,0)";
 			
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";

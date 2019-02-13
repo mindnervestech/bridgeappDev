@@ -138,13 +138,13 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 		if(!locationList.isEmpty()) {
 			for(int i=0;i<locationList.size();i++) {
 					if(!locationList.get(i).getValue().equals("all")) {
-						if(i != locationList.size()-1)
-							locationCondition = locationCondition + " pcp_location_code="+'\''+locationList.get(i).getValue()+'\''+" or ";
-						else
-							locationCondition = locationCondition + " pcp_location_code="+'\''+locationList.get(i).getValue()+'\'';
+						locationCondition = locationCondition + " or pcp_location_code="+'\''+locationList.get(i).getValue()+'\'';
 					}
 				}
 		}
+		
+		if(!locationCondition.equals(""))
+			locationCondition = locationCondition.substring(3);
 		
 		if(!locationCondition.equals(""))
 			conditionStr = conditionStr + " and ("+locationCondition+")";

@@ -7182,7 +7182,7 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	        	table.addCell(cell5);
 	        }
 	        if(fileVM.showAssignedPcp_membershipManagement) {
-	        	PdfPCell cell7 = new PdfPCell(new Paragraph("Assigned PCP", font));
+	        	PdfPCell cell7 = new PdfPCell(new Paragraph("PCP Name", font));
 	        	cell7.setHorizontalAlignment(Element.ALIGN_CENTER);
 		        cell7.setVerticalAlignment(Element.ALIGN_TOP);
 		        cell7.setBackgroundColor(myColor);
@@ -11374,7 +11374,7 @@ public void generateBeneficiariesManagementByClinicExpandReportPDF(Beneficiaries
 	      
 	      if(fileVM.showAssignedPcp_membershipManagement) {
 	    	  Cell cell1 = headerRow.createCell(++headerIndex);
-	    	  cell1.setCellValue("Assigned PCP");
+	    	  cell1.setCellValue("PCP Name");
 	    	  cell1.setCellStyle(headerCellStyle);
 	      }
 	      
