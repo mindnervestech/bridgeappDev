@@ -494,7 +494,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "mbi";
 			}
 			if(filteredList.get(i).getId().equals("patientName")) {
-				filterColumnName = "last_name";
+				filterColumnName = "concat(last_name,' ',first_name)";
 			}
 			if(filteredList.get(i).getId().equals("dob")) {
 				filterColumnName = "birth_date";
@@ -545,7 +545,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "mbi";
 			}
 			if(sortedList.get(0).getId().equals("patientName")) {
-				sortColName = "last_name";
+				sortColName = "concat(last_name,' ',first_name)";
 			}
 			if(sortedList.get(0).getId().equals("dob")) {
 				sortColName = "birth_date";
@@ -566,7 +566,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "mra";
 			}
 			if(sortedList.get(0).getId().equals("totalCost")) {
-				sortColName = "total";
+				sortColName = "round(total,0)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
@@ -679,10 +679,10 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "pcp_location_code";
 			}
 			if(filteredList.get(i).getId().equals("mra")) {
-				filterColumnName = "mra";
+				filterColumnName = "round(mra,2)";
 			}
 			if(filteredList.get(i).getId().equals("totalCost")) {
-				filterColumnName = "total";
+				filterColumnName = "round(total,2)";
 			}
 			
 			if(filterColumnName.equals("pcp_location_code")) {
@@ -706,10 +706,10 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "pcp_location_code";
 			}
 			if(sortedList.get(0).getId().equals("mra")) {
-				sortColName = "mra";
+				sortColName = "round(mra,2)";
 			}
 			if(sortedList.get(0).getId().equals("totalCost")) {
-				sortColName = "total";
+				sortColName = "round(total,2)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
@@ -971,10 +971,10 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "pcpLocation";
 			}
 			if(filteredList.get(i).getId().equals("averageMra")) {
-				filterColumnName = "mra";
+				filterColumnName = "round(mra,2)";
 			}
 			if(filteredList.get(i).getId().equals("totalCost")) {
-				filterColumnName = "total";
+				filterColumnName = "round(total,2)";
 			}
 			
 			/*if(filterColumnName.equals("mbi") || filterColumnName.equals("last_name") || filterColumnName.equals("birth_date")) {
@@ -1001,10 +1001,10 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "pcpLocation";
 			}
 			if(sortedList.get(0).getId().equals("averageMra")) {
-				sortColName = "mra";
+				sortColName = "round(mra,2)";
 			}
 			if(sortedList.get(0).getId().equals("totalCost")) {
-				sortColName = "total";
+				sortColName = "round(total,2)";
 			}
 			
 			if(!sortColName.equals("")) {
@@ -1164,7 +1164,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
-				filterColumnName = "cost";
+				filterColumnName = "round(cost,0)";
 			}
 			
 			if(!filterColumnName.equals("")) {
@@ -1204,7 +1204,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
-				sortColName = "cost";
+				sortColName = "round(cost,0)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
@@ -1374,7 +1374,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
-				filterColumnName = "cost";
+				filterColumnName = "round(cost,2)";
 			}
 			
 			if(!filterColumnName.equals("")) {
@@ -1416,7 +1416,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
-				sortColName = "cost";
+				sortColName = "round(cost,2)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
@@ -1587,7 +1587,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
-				filterColumnName = "cost";
+				filterColumnName = "round(cost,2)";
 			}
 			
 			if(!filterColumnName.equals("")) {
@@ -1629,7 +1629,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
-				sortColName = "cost";
+				sortColName = "round(cost,2)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";
@@ -1759,7 +1759,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("cost")) {
-				filterColumnName = "cost";
+				filterColumnName = "round(cost,2)";
 			}
 			
 			if(!filterColumnName.equals("")) {
@@ -1799,7 +1799,7 @@ public class DemographicDetailDaoJpa extends BaseDaoJpa<DemographicDetail> imple
 				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("cost")) {
-				sortColName = "cost";
+				sortColName = "round(cost,2)";
 			}
 			if(!sortColName.equals("")) {
 				sortStr+= " "+sortColName+" ";

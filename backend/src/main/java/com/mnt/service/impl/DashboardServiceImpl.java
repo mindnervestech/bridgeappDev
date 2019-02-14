@@ -2121,8 +2121,12 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPcpName(obj[4].toString());
 			if(obj[5] != null)
 				dataVM.setDrgCode(obj[5].toString());
+			else
+				dataVM.setDrgCode("");
 			if(obj[6] != null)
 				dataVM.setBetosCat(obj[6].toString());
+			else 
+				dataVM.setBetosCat("");
 			if(obj[7] != null)
 				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			if(obj[8] != null)
@@ -2155,8 +2159,12 @@ public class DashboardServiceImpl implements DashboardService {
 				dataVM.setPcpName(obj[4].toString());
 			if(obj[5] != null)
 				dataVM.setDrgCode(obj[5].toString());
+			else
+				dataVM.setDrgCode("");
 			if(obj[6] != null)
 				dataVM.setBetosCat(obj[6].toString());
+			else
+				dataVM.setBetosCat("");
 			if(obj[7] != null)
 				dataVM.setCost("$"+formatter.format(Double.parseDouble(obj[7].toString())));
 			if(obj[8] != null)
