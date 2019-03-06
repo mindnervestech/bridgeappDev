@@ -1578,10 +1578,10 @@ public class DashboardServiceImpl implements DashboardService {
 		for(Object[] obj: resultData) {
 			DuplicateClaimsReportVM dataVM = new DuplicateClaimsReportVM();
 			
+			if(obj[0] != null)
+				dataVM.setSubscriberId(obj[0].toString());
 			if(obj[1] != null)
-				dataVM.setSubscriberId(obj[1].toString());
-			if(obj[2] != null)
-				dataVM.setPlanName(obj[2].toString());
+				dataVM.setPlanName(obj[1].toString());
 			if(obj[3] != null)
 				dataVM.setPatientName(obj[3].toString());
 			if(obj[4] != null)
@@ -1776,10 +1776,10 @@ public class DashboardServiceImpl implements DashboardService {
 		for(Object[] obj: resultData) {
 			DuplicateClaimPrintDataVM dataVM = new DuplicateClaimPrintDataVM();
 			
+			if(obj[0] != null)
+				dataVM.setSubscriberId(obj[0].toString());
 			if(obj[1] != null)
-				dataVM.setSubscriberId(obj[1].toString());
-			if(obj[2] != null)
-				dataVM.setPlanName(obj[2].toString());
+				dataVM.setPlanName(obj[1].toString());
 			if(obj[3] != null)
 				dataVM.setPatientName(obj[3].toString());
 			if(obj[4] != null)
