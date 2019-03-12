@@ -2610,6 +2610,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		}
 		String filterStr = "";
 		String filterColumnName = "";
+		String havingStr = "";
 		for(int i=0;i<filteredList.size();i++) {
 			if(filteredList.get(i).getId().equals("claimId")) {
 				filterColumnName = "claim_id";
@@ -2618,7 +2619,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				filterColumnName = "first_service_date";
 			}
 			if(filteredList.get(i).getId().equals("claimType")) {
-				filterColumnName = "";
+				filterColumnName = "claimType";
 			}
 			if(filteredList.get(i).getId().equals("clinicName")) {
 				filterColumnName = "clinic_facility_name";
@@ -2630,7 +2631,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				filterColumnName = "betos_cat";
 			}
 			if(filteredList.get(i).getId().equals("drgCode")) {
-				filterColumnName = "drg_code";
+				filterColumnName = "";
 			}
 			if(filteredList.get(i).getId().equals("icdCodes")) {
 				filterColumnName = "principal_diagnosis";
@@ -2642,7 +2643,11 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				filterColumnName = "paid_amount";
 			}
 			
-				if(!filterColumnName.equals("")) {
+				if(!filterColumnName.equals("") && filterColumnName.equals("claimType"))
+				{
+					havingStr +="having "+filterColumnName + " like '%"+filteredList.get(i).getValue()+"%' ";
+					}
+				else if(!filterColumnName.equals("") && !filterColumnName.equals("claimType")) {
 					filterStr += " and "+filterColumnName+" like "+'\''+"%"+filteredList.get(i).getValue()+"%"+'\''+" ";
 				}
 			
@@ -2658,7 +2663,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				sortColName = "first_service_date";
 			}
 			if(sortedList.get(0).getId().equals("claimType")) {
-				sortColName = "";
+				sortColName = "claimType";
 			}
 			if(sortedList.get(0).getId().equals("clinicName")) {
 				sortColName = "clinic_facility_name";
@@ -2670,7 +2675,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				sortColName = "betos_cat";
 			}
 			if(sortedList.get(0).getId().equals("drgCode")) {
-				sortColName = "drg_code";
+				sortColName = "";
 			}
 			if(sortedList.get(0).getId().equals("icdCodes")) {
 				sortColName = "principal_diagnosis";
@@ -2721,12 +2726,12 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				queryStr = "select claim_id,first_service_date,'INST CLAIMS' as claimType,clinic_facility_name,pcp_name,betos_cat,drg_code,principal_diagnosis,paid_amount\n" + 
 						" from inst_claim_detail where medicare_id="+'\''+vm.getMedicareId()+'\''+
 						" and first_service_date="+'\''+vm.getFirstServiceDate()+'\''+" and service_month="+'\''+vm.getServiceMonth()+'\''+" and paid_amount="+'\''+vm.getPaidAmount()+'\''+conditionStr
-						+filterStr;
+						+filterStr+havingStr;
 			} else {
 				queryStr = "select claim_id,first_service_date,'PROF CLAIMS' as claimType,clinic_facility_name,pcp_name,betos_cat,'' as drg_code,principal_diagnosis,paid_amount\n" + 
 						" from prof_claim_detail where medicare_id="+'\''+vm.getMedicareId()+'\''+
 						" and first_service_date="+'\''+vm.getFirstServiceDate()+'\''+" and service_month="+'\''+vm.getServiceMonth()+'\''+" and paid_amount="+'\''+vm.getPaidAmount()+'\''+conditionStr
-						+filterStr;
+						+filterStr+havingStr;
 			}
 		
 		
@@ -2774,7 +2779,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 				filterColumnName = "member_name";
 			}
 			if(filteredList.get(i).getId().equals("subscriberId")) {
-				filterColumnName = "subscriber_id";
+				filterColumnName = "medicare_id";
 			}
 			if(filteredList.get(i).getId().equals("pcpName")) {
 				filterColumnName = "pcp_name";
@@ -2807,7 +2812,7 @@ public class InstClaimDetailDaoJpa extends BaseDaoJpa<InstClaimDetail> implement
 		String sortColName = "";
 		if(!sortedList.isEmpty()) {
 			if(sortedList.get(0).getId().equals("subscriberId")) {
-				sortColName = "subscriber_id";
+				sortColName = "medicare_id";
 			}
 			if(sortedList.get(0).getId().equals("patientName")) {
 				sortColName = "member_name";
