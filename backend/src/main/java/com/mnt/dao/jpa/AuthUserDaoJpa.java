@@ -37,4 +37,24 @@ public class AuthUserDaoJpa extends BaseDaoJpa<AuthUser> implements AuthUserDao 
 	     query.setParameter("id", groupId);
 	     query.executeUpdate();
 	}
+
+	@Override
+	public AuthUser findByUserName(String username) {
+		Query query = getEntityManager().createQuery("SELECT au FROM AuthUser AS au WHERE au.email=:email");
+	     query.setParameter("email", username);
+	     try {
+	    	 return (AuthUser) query.getSingleResult();
+	     } catch(NoResultException e) {
+	    	 return null;
+	     }
+	}
+	
+
+	@Override
+	@Transactional
+	public boolean ChangePassword(String email,String newPassword) {
+		Query query = getEntityManager().createNativeQuery("UPDATE auth_user SET password = '"+newPassword+"' WHERE email = '"+email+"'");
+		query.executeUpdate();
+		return true;
+	}
 }

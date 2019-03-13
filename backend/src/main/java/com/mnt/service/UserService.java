@@ -15,4 +15,9 @@ public interface UserService {
 	UserVM getUserById(Long userId);
 	void deleteUserById(Long userId);
 	void deleteGroupById(Long groupId);
+	public boolean sentOTP(String email);
+	public boolean validateOTP(String email, String otp);
+	public boolean changeForgottenPassword(String email, String newPassword);
+
+
 }

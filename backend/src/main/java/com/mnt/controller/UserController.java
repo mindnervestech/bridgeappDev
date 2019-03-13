@@ -1,7 +1,7 @@
 package com.mnt.controller;
 
 import java.util.List;
-import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,4 +68,22 @@ public class UserController {
     public List<UserVM> getAllUsers() {
 		return userService.getAllUsers();
     }
+	
+	@RequestMapping(value="/forgotPassword/sentOTP",method = RequestMethod.POST)
+	@ResponseBody
+    public boolean sentOTP(@RequestParam(value="email") String email) {
+		return userService.sentOTP(email);
+    }
+	
+	@RequestMapping(value="/forgotPassword/validateOTP",method = RequestMethod.POST)
+	@ResponseBody
+	public boolean validateOTP(@RequestParam(value="email") String email, @RequestParam(value="otp") String otp) {
+		return userService.validateOTP(email, otp);
+	}
+	
+	@RequestMapping(value="/forgotPassword/changePassword",method = RequestMethod.POST)
+	@ResponseBody
+	public boolean changePassword(@RequestParam(value="email") String email, @RequestParam(value="newPassword") String newPassword) {
+		return userService.changeForgottenPassword(email, newPassword);
+	}
 }
