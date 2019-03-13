@@ -2,24 +2,37 @@ package com.mnt.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.*;
 
 import com.mnt.dao.AuthUserDao;
 import com.mnt.dao.GroupSetDao;
+import com.mnt.dao.OTPDetailsDao;
 import com.mnt.dao.PermissionMatrixDao;
 import com.mnt.dao.RoleDao;
 import com.mnt.domain.AuthUser;
 import com.mnt.domain.GroupSet;
+import com.mnt.domain.OTPDetails;
 import com.mnt.domain.PermissionMatrix;
 import com.mnt.domain.Role;
+import com.mnt.security.TokenHandler;
 import com.mnt.service.UserService;
 import com.mnt.vm.PermissionsVM;
 import com.mnt.vm.RoleVM;
 import com.mnt.vm.UserVM;
 
-@Repository
+@Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
@@ -30,6 +43,14 @@ public class UserServiceImpl implements UserService {
 	GroupSetDao groupSetDao;
 	@Autowired
 	PermissionMatrixDao permissionMatrixDao;
+	@Autowired
+	OTPDetailsDao otpDetailsDao;
+	
+	@Autowired
+	private JavaMailSender sender;
+	
+	@Autowired
+	AuthenticationManager authenticationProvider;
 	
 	
 	public void saveUser(UserVM userVM) {
@@ -82,6 +103,16 @@ public class UserServiceImpl implements UserService {
 		if(user == null) {
 			vm.setId(-1L);
 		} else {
+	        
+			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
+	        AuthUser details = new AuthUser();
+	        details.setUsername(email);
+	        token.setDetails(details);
+	        Authentication auth = authenticationProvider.authenticate(token);
+	        SecurityContextHolder.getContext().setAuthentication(auth);
+	        
+			System.out.println(TokenHandler.createTokenForUser(user.getEmail()));
+			
 			vm.setId(user.getId());
 			vm.setEmail(user.getEmail());
 			//vm.setPassword(user.getPassword());
@@ -101,6 +132,7 @@ public class UserServiceImpl implements UserService {
 				}
 			}
 			vm.setPermissions(permissionsList);
+			vm.setToken(TokenHandler.createTokenForUser(user.getEmail()));
 		}
 		return vm;
 	}
@@ -159,6 +191,7 @@ public class UserServiceImpl implements UserService {
 		vm.setGroupIdList(groupIds);
 		return vm;
 	}
+
 	
 	public void deleteUserById(Long userId) {
 		AuthUser user = authUserDao.loadById(userId);
@@ -171,5 +204,43 @@ public class UserServiceImpl implements UserService {
 		authUserDao.deleteUsersGroup(groupId);
 		groupSetDao.delete(group);
 	}
+
+	String GenerateRandomNumber(int charLength) {
+        return String.valueOf(charLength < 1 ? 0 : new Random()
+                .nextInt((9 * (int) Math.pow(10, charLength - 1)) - 1)
+                + (int) Math.pow(10, charLength - 1));
+    }
 	
+	@Override
+	public boolean sentOTP(String email) {
+		if(authUserDao.findByUserName(email) != null){
+			 MimeMessage message = sender.createMimeMessage();
+		      MimeMessageHelper helper = new MimeMessageHelper(message);
+	          try {
+	        	  helper.setFrom("mindnervesdemo@gmail.com");
+	              helper.setTo(email.toString());
+	              String otp=GenerateRandomNumber(4);
+	              helper.setText("Hey! "+email+"\nAEIGS Group has received a request to reset the password for your account.\nFor reset your password OTP is : "+otp);
+	              helper.setSubject("Password Recovery #AEGIS");
+	              otpDetailsDao.setOTPandEmail(email, otp);
+	              sender.send(message);
+	              System.out.println("Email Send to :"+email);     
+	          }
+	          catch (Exception e) {
+	        	 e.printStackTrace();
+			}
+	      return true;
+		}
+       return false;
+	}
+	
+	@Override
+	public boolean validateOTP(String email, String otp) {
+		return otpDetailsDao.validateEmailAndOTP(email, otp);
+	}
+	
+	@Override
+	public boolean changeForgottenPassword(String email,String newPassword) {
+		return authUserDao.ChangePassword(email, newPassword);
+	}
 }
