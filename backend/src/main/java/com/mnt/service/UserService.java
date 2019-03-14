@@ -18,6 +18,7 @@ public interface UserService {
 	public boolean sentOTP(String email);
 	public boolean validateOTP(String email, String otp);
 	public boolean changeForgottenPassword(String email, String newPassword);
+	boolean changePasswordFirstTime(String email, String newPassword);
 
 
 }

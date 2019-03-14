@@ -8,4 +8,5 @@ public interface AuthUserDao  extends BaseDao<AuthUser> {
 	void deleteUsersGroup(Long groupId);
 	AuthUser findByUserName(String username);
 	public boolean ChangePassword(String email, String newPassword);
+	boolean ChangePasswordFirstTime(String email, String newPassword);
 }

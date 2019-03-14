@@ -85,5 +85,10 @@ public class UserController {
 	@ResponseBody
 	public boolean changePassword(@RequestParam(value="email") String email, @RequestParam(value="newPassword") String newPassword) {
 		return userService.changeForgottenPassword(email, newPassword);
+	}	
+	@RequestMapping(value="changePasswordFirstTime",method = RequestMethod.POST)
+	@ResponseBody
+	public boolean changePasswordFirstTime(@RequestParam(value="email") String email, @RequestParam(value="newPassword") String newPassword) {
+		return userService.changePasswordFirstTime(email, newPassword);
 	}
 }

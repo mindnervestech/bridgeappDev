@@ -54,7 +54,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Allow anonymous resource requests
                 .antMatchers("/userLogin").permitAll()
                 .antMatchers("/forgotPassword/**").permitAll()
-
+                .antMatchers("/changePasswordFirstTime").permitAll()
                 
                 // All other request need to be authenticated
                 .anyRequest().authenticated().and()

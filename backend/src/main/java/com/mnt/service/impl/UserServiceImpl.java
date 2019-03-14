@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 		authUser.setFirstName(userVM.getFirstName());
 		authUser.setLastName(userVM.getLastName());
 		authUser.setPhone(userVM.getPhone());
-		authUser.setActive(true);
+		authUser.setActive(false);
 		/*Role role = roleDao.loadById(userVM.getRoleId());
 		List<Role> roles = new ArrayList<>();
 		roles.add(role);
@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
 			groups.add(group);
 		}
 		authUser.setGroups(groups);
+		sendUserNameAndPassword(userVM.getEmail(), userVM.getPassword());
 		authUserDao.save(authUser);
 	}
 	
@@ -102,7 +103,8 @@ public class UserServiceImpl implements UserService {
 		UserVM vm = new UserVM();
 		if(user == null) {
 			vm.setId(-1L);
-		} else {
+		} 
+		else {
 	        
 			UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
 	        AuthUser details = new AuthUser();
@@ -133,6 +135,7 @@ public class UserServiceImpl implements UserService {
 			}
 			vm.setPermissions(permissionsList);
 			vm.setToken(TokenHandler.createTokenForUser(user.getEmail()));
+			vm.setActive(user.isActive());
 		}
 		return vm;
 	}
@@ -211,6 +214,22 @@ public class UserServiceImpl implements UserService {
                 + (int) Math.pow(10, charLength - 1));
     }
 	
+	public void sendUserNameAndPassword(String email, String password) {
+
+			 MimeMessage message = sender.createMimeMessage();
+		      MimeMessageHelper helper = new MimeMessageHelper(message);
+	          try {
+	        	  helper.setFrom("mindnervesdemo@gmail.com");
+	              helper.setTo(email);
+	              helper.setText("Hey! "+email+"\nCongratulations !!\nYour AEIGS account is created by AEIGS Group,\n Your login id is :"+email+"\n and password is :"+password);
+	              helper.setSubject("Congratulations Your Account was Successfully Created #AEGIS");
+	              sender.send(message);
+	              System.out.println("Email Send to :"+email);     
+	          }
+	          catch (Exception e) {
+	        	 e.printStackTrace();	
+		}
+	}	
 	@Override
 	public boolean sentOTP(String email) {
 		if(authUserDao.findByUserName(email) != null){
@@ -225,13 +244,15 @@ public class UserServiceImpl implements UserService {
 	              otpDetailsDao.setOTPandEmail(email, otp);
 	              sender.send(message);
 	              System.out.println("Email Send to :"+email);     
+	              return true;
 	          }
 	          catch (Exception e) {
 	        	 e.printStackTrace();
+	             return false;
 			}
-	      return true;
 		}
-       return false;
+        return false;
+ 
 	}
 	
 	@Override
@@ -242,5 +263,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean changeForgottenPassword(String email,String newPassword) {
 		return authUserDao.ChangePassword(email, newPassword);
+	}
+
+	@Override
+	public boolean changePasswordFirstTime(String email, String newPassword) {
+		return authUserDao.ChangePasswordFirstTime(email , newPassword);
 	}
 }
