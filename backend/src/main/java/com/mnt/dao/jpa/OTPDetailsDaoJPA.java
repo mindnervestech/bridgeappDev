@@ -23,8 +23,10 @@ public class OTPDetailsDaoJPA extends BaseDaoJpa<OTPDetails> implements OTPDetai
 	@Override
 	@Transactional
 	public boolean setOTPandEmail(String email, String otp) {
-		Query query = getEntityManager().createNativeQuery("INSERT INTO `otp_details`(email,otp) VALUES ('"+email+"',"+otp+")");
+		Query query = getEntityManager().createNativeQuery("DELETE FROM otp_details WHERE email = '"+email+"'");
 		query.executeUpdate();
+		 query = getEntityManager().createNativeQuery("INSERT INTO `otp_details`(email,otp) VALUES ('"+email+"',"+otp+")");
+		 query.executeUpdate();
 		return true;
 	}
 	
@@ -36,8 +38,11 @@ public class OTPDetailsDaoJPA extends BaseDaoJpa<OTPDetails> implements OTPDetai
 		List<Object[]> result =query.getResultList();
 		
 		for(Object[] obj : result)
-			if(obj[0].equals(email) && obj[1].equals(otp))
+			if(obj[0].equals(email) && obj[1].equals(otp)) {
+				query = getEntityManager().createNativeQuery("DELETE FROM otp_details WHERE email = '"+email+"'");
+				query.executeUpdate();
 				return true;	
+			}
 		return false;
 	}
 

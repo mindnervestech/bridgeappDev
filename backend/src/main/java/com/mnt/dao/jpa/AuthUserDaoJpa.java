@@ -53,8 +53,12 @@ public class AuthUserDaoJpa extends BaseDaoJpa<AuthUser> implements AuthUserDao 
 	@Override
 	@Transactional
 	public boolean ChangePassword(String email,String newPassword) {
+		
 		Query query = getEntityManager().createNativeQuery("UPDATE auth_user SET password = '"+newPassword+"' WHERE email = '"+email+"'");
 		query.executeUpdate();
+		query = getEntityManager().createNativeQuery("DELETE FROM otp_details WHERE email = '"+email+"'");
+		query.executeUpdate();
 		return true;
+
 	}
 }
